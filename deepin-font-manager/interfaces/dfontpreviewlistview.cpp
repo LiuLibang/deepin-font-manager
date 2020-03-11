@@ -269,8 +269,6 @@ void DFontPreviewListView::selectFonts(QStringList fileList)
 
 void DFontPreviewListView::mouseMoveEvent(QMouseEvent *event)
 {
-    DListView::mouseMoveEvent(event);
-
     if (m_fontPreviewItemModel && m_fontPreviewItemModel->rowCount() == 0) {
         return;
     }
@@ -296,6 +294,8 @@ void DFontPreviewListView::mouseMoveEvent(QMouseEvent *event)
         itemData.collectIconStatus = IconNormal;
     }
     m_fontPreviewProxyModel->setData(modelIndex, QVariant::fromValue(itemData), Qt::DisplayRole);
+
+    DListView::mouseMoveEvent(event);
 }
 
 void DFontPreviewListView::mousePressEvent(QMouseEvent *event)
@@ -305,8 +305,6 @@ void DFontPreviewListView::mousePressEvent(QMouseEvent *event)
     } else {
         m_bLeftMouse = false;
     }
-
-    DListView::mousePressEvent(event);
 
     if (m_fontPreviewItemModel && m_fontPreviewItemModel->rowCount() == 0) {
         return;
@@ -329,12 +327,12 @@ void DFontPreviewListView::mousePressEvent(QMouseEvent *event)
         itemData.collectIconStatus = IconNormal;
     }
     m_fontPreviewProxyModel->setData(modelIndex, QVariant::fromValue(itemData), Qt::DisplayRole);
+
+    DListView::mousePressEvent(event);
 }
 
 void DFontPreviewListView::mouseReleaseEvent(QMouseEvent *event)
 {
-    DListView::mouseReleaseEvent(event);
-
     if (m_fontPreviewItemModel && m_fontPreviewItemModel->rowCount() == 0) {
         return;
     }
@@ -363,20 +361,26 @@ void DFontPreviewListView::mouseReleaseEvent(QMouseEvent *event)
         emit onClickEnableButton(indexList, !itemData.isEnabled);
     } else if (collectIconRect.contains(clickPoint)) {
         //触发收藏/取消收藏
-        emit onClickCollectionButton(modelIndex);
+//        emit onClickCollectionButton(modelIndex);
+        onListViewItemCollectionBtnClicked(modelIndex);
+        m_bClickCollection = true;
+        return;
     }
+
+    m_bClickCollection = false;
+
+    DListView::mouseReleaseEvent(event);
 }
 
 void DFontPreviewListView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     Q_UNUSED(event)
+    DListView::mouseDoubleClickEvent(event);
 }
 
 void DFontPreviewListView::setSelection(const QRect &rect,
                                         QItemSelectionModel::SelectionFlags command)
 {
-    DListView::setSelection(rect, command);
-
     QPoint clickPoint(rect.x(), rect.y());
     QModelIndex modelIndex = indexAt(clickPoint);
     m_currModelIndex = modelIndex;
@@ -384,6 +388,11 @@ void DFontPreviewListView::setSelection(const QRect &rect,
     if (!m_bLeftMouse) {
         emit onShowContextMenu(modelIndex);
     }
+
+    if (m_bClickCollection) {
+        return;
+    }
+    DListView::setSelection(rect, command);
 }
 
 void DFontPreviewListView::setModel(QAbstractItemModel *model)
