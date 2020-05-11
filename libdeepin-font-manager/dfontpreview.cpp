@@ -31,15 +31,14 @@
 static const QString lowerTextStock = "abcdefghijklmnopqrstuvwxyz";
 static const QString upperTextStock = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 static const QString punctuationTextStock = "0123456789.:,;(*!?')";
-static QString sampleString = nullptr;
-static QString styleName = nullptr;
+static QString sampleString;
+static QString styleName;
 static QHash<QString, QString> contents = {};
 
 DFontPreview::DFontPreview(QWidget *parent)
-    : QWidget(parent),
-      m_library(0),
-      m_face(0),
-      fontDatabase(new QFontDatabase)
+    : QWidget(parent)
+    , m_library(nullptr)
+    , m_face(nullptr)
 {
     initContents();
 
@@ -61,8 +60,10 @@ void DFontPreview::setFileUrl(const QString &url)
     FT_Init_FreeType(&m_library);
     m_error = FT_New_Face(m_library, url.toUtf8().constData(), 0, &m_face);
 
-    if (m_error != 0 && QFileInfo(url).completeSuffix() != "pcf.gz")
+    if (m_error != 0 && QFileInfo(url).completeSuffix() != "pcf.gz") {
+        qDebug() << __FUNCTION__ << m_error;
         return;
+    }
 
     sampleString = getSampleString().simplified();
     styleName = (char *) m_face->style_name;
@@ -78,7 +79,7 @@ void DFontPreview::paintEvent(QPaintEvent *e)
     QPainter painter(this);
     painter.setRenderHint(QPainter::Antialiasing, true);
 
-    QFont font(fontDatabase->applicationFontFamilies(0).first());
+    QFont font(fontDatabase.applicationFontFamilies(0).first());
     painter.setPen(Qt::black);
 
     if (styleName.contains("Italic")) {
@@ -150,7 +151,7 @@ void DFontPreview::paintEvent(QPaintEvent *e)
         if (y + sampleHeight >= rect().height() - padding * 2)
             break;
 
-        painter.drawText(QRect(x, y + padding * 2, sampleWidth , sampleHeight), Qt::AlignLeft, sampleString);
+        painter.drawText(QRect(x, y + padding * 2, sampleWidth, sampleHeight), Qt::AlignLeft, sampleString);
         y += sampleHeight + padding;
     }
 
@@ -180,7 +181,7 @@ void DFontPreview::initContents()
 
 QString DFontPreview::getSampleString()
 {
-    QString sampleString = nullptr;
+    QString sampleString;
     bool isAvailable = false;
 
     // check the current system language sample string.
@@ -207,15 +208,15 @@ QString DFontPreview::getSampleString()
 
 QString DFontPreview::getLanguageSampleString(const QString &language)
 {
-    QString result = nullptr;
-    QString key = nullptr;
+    QString result;
+    QString key;
 
     if (contents.contains(language)) {
         key = language;
     } else {
         const QStringList parseList = language.split("_", QString::SkipEmptyParts);
         if (parseList.length() > 0 &&
-            contents.contains(parseList.first())) {
+                contents.contains(parseList.first())) {
             key = parseList.first();
         }
     }
@@ -230,6 +231,9 @@ QString DFontPreview::getLanguageSampleString(const QString &language)
 
 bool DFontPreview::checkFontContainText(const QString &text)
 {
+    if (m_face == nullptr)
+        return false;
+
     bool retval = true;
 
     FT_Select_Charmap(m_face, FT_ENCODING_UNICODE);

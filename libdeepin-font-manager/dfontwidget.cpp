@@ -23,9 +23,9 @@
 DFontWidget::DFontWidget(QWidget *parent)
     : QWidget(parent),
       m_layout(new QStackedLayout(this)),
-      m_preview(new DFontPreview),
+      m_preview(new DFontPreview(this)),
       m_thread(new DFontLoadThread),
-      m_spinner(new DSpinner)
+      m_spinner(new DSpinner(this))
 {
     QWidget *spinnerPage = new QWidget;
     QVBoxLayout *spinnerLayout = new QVBoxLayout(spinnerPage);
@@ -40,6 +40,8 @@ DFontWidget::DFontWidget(QWidget *parent)
 
 DFontWidget::~DFontWidget()
 {
+    if (m_thread)
+        m_thread->deleteLater();
 }
 
 void DFontWidget::setFileUrl(const QString &url)
@@ -49,15 +51,15 @@ void DFontWidget::setFileUrl(const QString &url)
     m_layout->setCurrentIndex(0);
     m_spinner->start();
 
-    m_preview->fontDatabase->removeAllApplicationFonts();
-    m_thread->quit();
+    m_preview->fontDatabase.removeAllApplicationFonts();
+//    m_thread->quit();
     m_thread->open(url);
     m_thread->start();
 }
 
 void DFontWidget::handleFinished(const QByteArray &data)
 {
-    if (m_preview->fontDatabase->addApplicationFontFromData(data) == -1) {
+    if (m_preview->fontDatabase.addApplicationFontFromData(data) == -1) {
         m_spinner->stop();
         return;
     }
