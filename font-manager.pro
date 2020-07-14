@@ -4,6 +4,7 @@
 
 TEMPLATE = subdirs
 
+
 SUBDIRS += \
            deepin-font-manager\
            libdeepin-font-manager \
