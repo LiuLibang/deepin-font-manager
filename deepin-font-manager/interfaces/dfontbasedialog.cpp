@@ -5,6 +5,7 @@
 #include <QApplication>
 
 #include <DFontSizeManager>
+#include <QDebug>
 
 DWIDGET_USE_NAMESPACE
 
@@ -111,6 +112,7 @@ void DFontBaseDialog::setLogoVisable(bool visible)
 {
     if (nullptr != m_logoIcon) {
         m_logoIcon->setVisible(visible);
+//        qDebug() << m_logoIcon->isVisible() << endl;
     }
 }
 
@@ -157,7 +159,6 @@ QLayout *DFontBaseDialog::getContentLayout()
 void DFontBaseDialog::addContent(QWidget *content)
 {
     Q_ASSERT(nullptr != getContentLayout());
-
     getContentLayout()->addWidget(content);
 }
 

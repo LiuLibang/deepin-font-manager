@@ -50,6 +50,7 @@ private:
     DFInstallErrorListView *m_parentView;
 };
 
+
 class QStandardItemModel;
 /*************************************************************************
  <Class>         DFInstallErrorListView

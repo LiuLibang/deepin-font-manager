@@ -33,15 +33,7 @@
 #include <fontconfig/fontconfig.h>
 #include <fontconfig/fcfreetype.h>
 
-static const QString lowerTextStock = "abcdefghijklmnopqrstuvwxyz";
-static const QString upperTextStock = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
-static const QString punctuationTextStock = "0123456789.:,;(*!?')";
-static const int textWidth = 1204;
-const int FIXED_WIDTH = 1280;
-const int FIXED_HEIGHT = 720;
-static QString sampleString = nullptr;
-static QString styleName = nullptr;
-static QHash<QString, QString> contents = {};
+
 
 /*************************************************************************
  <Function>      DFontPreview
@@ -92,6 +84,7 @@ void DFontPreview::setFileUrl(const QString &url)
     // fontDatabase->removeAllApplicationFonts();
     // fontDatabase->addApplicationFont(url);
 
+
     FT_Init_FreeType(&m_library);
     m_error = FT_New_Face(m_library, url.toUtf8().constData(), 0, &m_face);
 
@@ -101,6 +94,7 @@ void DFontPreview::setFileUrl(const QString &url)
     sampleString = getSampleString().simplified();
     styleName = QString(m_face->style_name);
 
+//    qDebug() << sampleString << "++++++++++++++++++" << styleName << endl;
     repaint();
 }
 
@@ -243,9 +237,10 @@ void DFontPreview::initContents()
     while (!stream.atEnd()) {
         const QString line = stream.readLine();
         const QStringList items = line.split(QChar(':'));
-
         contents.insert(items.at(0), items.at(1));
     }
+
+
 }
 
 /*************************************************************************

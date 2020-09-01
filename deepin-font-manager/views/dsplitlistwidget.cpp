@@ -466,6 +466,7 @@ void DSplitListWidget::wheelEvent(QWheelEvent *event)
             return;
         }
     }
+
     if (next == now) {
         return;
     } else {
@@ -580,7 +581,6 @@ bool DNoFocusDelegate::helpEvent(QHelpEvent *event, QAbstractItemView *view
             strtooltip.chop(1);
 //            QTimer::singleShot(1000, [ = ]() {
             QToolTip::showText(event->globalPos(), strtooltip, view);
-
 //            QTimer::singleShot(500, []() {
 //                QToolTip::hideText();
 //            });
@@ -623,6 +623,7 @@ void DSplitListWidget::mousePressEvent(QMouseEvent *event)
 {
     QPoint clickPoint = event->pos();
     QModelIndex modelIndex = indexAt(clickPoint);
+    qDebug() << modelIndex.row();
 
     m_IsMouseClicked = true;
     if (Qt::RightButton == event->button() || Qt::MiddleButton == event->button()) {
@@ -633,7 +634,7 @@ void DSplitListWidget::mousePressEvent(QMouseEvent *event)
 //    if (!hasFocus() && m_IsTabFocus) {
 //        m_IsTabFocus = false;
 //    }
-
+    qDebug() << currentIndex().row() << endl;
     if (modelIndex.row() == currentIndex().row())
         return;
     DListView::mousePressEvent(event);

@@ -9,7 +9,7 @@
 DWIDGET_USE_NAMESPACE
 
 /*************************************************************************
- <Class>         DFMXmlWrapper
+ <Class>         DFontBaseDialog
  <Description>   项目中弹出对话框的基类
  <Author>
  <Note>          null

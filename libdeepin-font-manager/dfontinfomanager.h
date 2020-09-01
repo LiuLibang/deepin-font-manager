@@ -159,7 +159,14 @@ public:
     bool isFontInstalled(DFontInfo &data);
     void getDefaultPreview(DFontInfo &data);
     void checkStyleName(DFontInfo &f);
-
+//    bool isSystemFont(const QString &filePath);
+//    {
+//        if (filePath.contains("/usr/share/fonts/")) {
+//            return true;
+//        } else {
+//            return false;
+//        }
+//    }
 //    //获取指定文件夹下所有的子文件夹
 //    QStringList getDirPathOfSplDir(QString dirPath)const;
 //    //获取文件夹下的字体文件

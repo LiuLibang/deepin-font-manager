@@ -383,7 +383,6 @@ void DFQuickInstallWindow::onFontInstallFinished()
 
         m_dbManager->addFontInfo(itemData);
 
-
         m_dbManager->endTransaction();
     }
 

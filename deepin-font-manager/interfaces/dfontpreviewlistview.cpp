@@ -521,7 +521,7 @@ void DFontPreviewListView::setRecoveryTabFocusState(bool recoveryTabFocusState)
  <Author>        UT000442
  <Input>
     <param1>     IsTabFocus            Description:是否为tabfocus
- <Return>        null            Description:null
+ <Return>        null            Description:nullinitDelegate
  <Note>          null
 *************************************************************************/
 void DFontPreviewListView::setIsTabFocus(bool IsTabFocus)

@@ -140,7 +140,7 @@ isMonoSpace TINYINT)";
 
 /*************************************************************************
  <Function>      addRecord
- <Description>   向数据库中增加数据
+ <Description>   向数据库中增加数据,源代码没有使用
  <Author>
  <Input>
     <param1>     data            Description:插入数据

@@ -14,7 +14,11 @@ PKGCONFIG += freetype2 fontconfig
 
 INCLUDEPATH += $$PWD/../libdeepin-font-manager \
                $$PWD/interfaces
+
 LIBS += -L$$OUT_PWD/../libdeepin-font-manager -ldeepin-font-manager
+
+#error(-L$$OUT_PWD)
+
 DEFINES += QT_MESSAGELOGCONTEXT
 
 HEADERS += utils.h \
@@ -44,7 +48,7 @@ HEADERS += utils.h \
     interfaces/dcomworker.h
 
 SOURCES += main.cpp \
-	   utils.cpp \
+           utils.cpp \
     views/dfontmgrmainwindow.cpp \
     interfaces/dfontmenumanager.cpp \
     interfaces/dfontpreviewitemdelegate.cpp \

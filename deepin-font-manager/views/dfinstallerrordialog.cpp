@@ -554,9 +554,9 @@ void DFInstallErrorDialog::addData(QStringList &errorFileList, QStringList &half
             itemModel.strFontFilePath = fileInfo.filePath();
             itemModel.strFontInstallStatus = DApplication::translate("DFInstallErrorDialog", "System Font");
             m_updateInstallErrorFontModelList.push_back(itemModel);
-        } else {
+        } /*else {
 //            qDebug() << "verifyFontFiles->" << it << " :new file";
-        }
+        }*/
     }
 
     for (auto &it : halfInstalledFilelist) {

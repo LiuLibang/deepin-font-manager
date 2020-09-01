@@ -180,6 +180,7 @@ bool DFontPreviewProxyModel::filterAcceptsRow(int source_row,
         return QSortFilterProxyModel::filterAcceptsRow(source_row, source_parent);
     }
 
+//    sourceModel();
     QModelIndex modelIndex = sourceModel()->index(source_row, 0, source_parent);
 
     if (modelIndex.isValid() == false) {
