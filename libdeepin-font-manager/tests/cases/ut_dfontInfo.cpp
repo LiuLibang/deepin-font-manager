@@ -466,7 +466,7 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_errorfam_is_normal)
 TEST_F(TestCheckFontIsInstalled, fontIsInstalled_installedFont_isnormal)
 {
 //因为static成员 dataList没有其他办法访问,所以先调用这个函数
-    dfm->refreshList();
+//    dfm->refreshList();
     DFontInfo fontInfo = dfm->getFontInfo("/usr/share/fonts/truetype/noto/NotoSansLinearB-Regular.ttf");
 
     EXPECT_EQ(true, dfm->isFontInstalled(fontInfo));
@@ -476,7 +476,7 @@ TEST_F(TestCheckFontIsInstalled, fontIsInstalled_installedFont_isnormal)
 TEST_F(TestCheckFontIsInstalled, fontIsInstalled_notInstalledFont_isnormal)
 {
 //因为static成员 dataList没有其他办法访问,所以先调用这个函数
-    dfm->refreshList();
+//    dfm->refreshList();
     DFontInfo fontInfo = dfm->getFontInfo(QDir::homePath() + "/Desktop/1048字体/食物.ttf");
 
     EXPECT_EQ(false, dfm->isFontInstalled(fontInfo));
@@ -486,7 +486,7 @@ TEST_F(TestCheckFontIsInstalled, fontIsInstalled_notInstalledFont_isnormal)
 TEST_F(TestCheckFontIsInstalled, fontIsInstalled_errorFont_isnormal)
 {
 //因为static成员 dataList没有其他办法访问,所以先调用这个函数
-    dfm->refreshList();
+//    dfm->refreshList();
     DFontInfo fontInfo;
     EXPECT_EQ(false, dfm->isFontInstalled(fontInfo));
 }
