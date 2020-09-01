@@ -110,6 +110,7 @@ void DCopyFilesManager::copyFiles(CopyFontThread::OPType type, const QStringList
     m_type = type;
     qint64 start = QDateTime::currentMSecsSinceEpoch();
     int tcount = QThread::idealThreadCount() > 0 ? QThread::idealThreadCount() : 1;
+
     if (tcount > fontList.size())
         tcount = fontList.size();
 

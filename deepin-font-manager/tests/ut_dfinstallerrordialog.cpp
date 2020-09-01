@@ -4,6 +4,7 @@
 #undef private
 #undef protected
 
+#include "views/dfinstallnormalwindow.h"
 #include "dstyleoption.h"
 #include "dfontinfomanager.h"
 #include "utils.h"
@@ -122,6 +123,9 @@ TEST_F(TestDFInstallErrorDialog, checkAddDataInstalled)
     Stub s;
     s.set(ADDR(DFontInfoManager, getFontInfo), stub_getFontInfoInstalled);
 
+    Stub s1;
+    s1.set(ADDR(DFInstallNormalWindow, isSystemFont), stub_isSystemFont);
+
     DFErrDialog->addData(list, list2, list2, list2);
 }
 
@@ -131,8 +135,11 @@ TEST_F(TestDFInstallErrorDialog, checkAddDataSystem)
     QStringList list;
     QStringList list2 = QStringList();
     list << "a";
+//    Stub s;
+//    s.set(ADDR(DFInstallErrorDialog, isSystemFont), stub_isSystemFont);
+
     Stub s;
-    s.set(ADDR(DFInstallErrorDialog, isSystemFont), stub_isSystemFont);
+    s.set(ADDR(DFInstallNormalWindow, isSystemFont), stub_isSystemFont);
 
     Stub s2;
     s2.set(ADDR(DFontInfoManager, getFontInfo), stub_getFontInfo);

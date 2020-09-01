@@ -20,10 +20,12 @@ HEADERS += $$PWD/utils.h \
     $$PWD/interfaces/dfontpreviewer.h \
     $$PWD/interfaces/dfontpreviewlistdatathread.h \
     $$PWD/interfaces/dfontbasedialog.h \
+    $$PWD/interfaces/dcomworker.h \
     $$PWD/views/dfontspinnerwidget.h \
     $$PWD/views/fonticontext.h \
     $$PWD/views/dfontinfoscrollarea.h \
     $$PWD/views/dfontspinner.h
+
 
 SOURCES += $$PWD/utils.cpp \
     $$PWD/views/dfontmgrmainwindow.cpp \
@@ -43,7 +45,9 @@ SOURCES += $$PWD/utils.cpp \
     $$PWD/interfaces/dfontpreviewer.cpp \
     $$PWD/interfaces/dfontpreviewlistdatathread.cpp \
     $$PWD/interfaces/dfontbasedialog.cpp \
+    $$PWD/interfaces/dcomworker.cpp \
     $$PWD/views/dfontspinnerwidget.cpp \
     $$PWD/views/fonticontext.cpp \
     $$PWD/views/dfontinfoscrollarea.cpp \
     $$PWD/views/dfontspinner.cpp
+

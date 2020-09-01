@@ -62,9 +62,9 @@ TEST_F(TestDFontInfoDialog, checkKeyPressEvent)
 TEST_F(TestDFontInfoDialog, checkAutoHeight)
 {
     dFontInforDialog->autoHeight(200);
-    EXPECT_TRUE(dFontInforDialog->scrollArea->viewport()->height() == static_cast<int>(200 * 1.1 + 10));
+    EXPECT_TRUE(dFontInforDialog->m_scrollArea->viewport()->height() == static_cast<int>(200 * 1.1 + 10));
     dFontInforDialog->autoHeight(350);
-    EXPECT_TRUE(dFontInforDialog->scrollArea->viewport()->height() == 375);
+    EXPECT_TRUE(dFontInforDialog->m_scrollArea->viewport()->height() == 375);
 }
 
 TEST_F(TestDFontInfoDialog, checkResizeEvent)
@@ -100,7 +100,7 @@ TEST_F(TestDFontInfoDialog, checkfontinfoAreaEventFilter)
 {
     QEvent *e = new QEvent(QEvent::FontChange);
 
-    dFontInforDialog->fontinfoArea->eventFilter(dFontInforDialog->fontinfoArea, e);
+    dFontInforDialog->m_fontinfoArea->eventFilter(dFontInforDialog->m_fontinfoArea, e);
 }
 
 

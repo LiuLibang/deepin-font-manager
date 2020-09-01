@@ -190,21 +190,28 @@ TEST_F(TestDfontmanager, checkDoUnstall)
 
 TEST_F(TestDfontmanager, checkOnInstallResultInstall)
 {
+    QSignalSpy spy(fm, SIGNAL(installFinished(int, const QStringList)));
+
     fm->m_instFileList.clear();
     fm->m_instFileList << "first";
     fm->setType(DFontManager::Install);
     fm->setCacheStatus(DFontManager::CacheNow);
     fm->onInstallResult("first", "");
 
+    EXPECT_TRUE(spy.count() == 1);
 }
 
 TEST_F(TestDfontmanager, checkOnInstallResultReInstall)
 {
+    QSignalSpy spy(fm, SIGNAL(reInstallFinished(int, const QStringList)));
+
     fm->m_instFileList.clear();
     fm->m_instFileList << "first";
     fm->setType(DFontManager::ReInstall);
     fm->setCacheStatus(DFontManager::CacheNow);
     fm->onInstallResult("first", "");
+
+    EXPECT_TRUE(spy.count() == 1);
 
 }
 
