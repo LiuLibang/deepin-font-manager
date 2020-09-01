@@ -21,8 +21,8 @@
 #include <QTimer>
 #include <QTranslator>
 #include <QDebug>
-//const int FIXED_WIDTH = 1280;
-//const int FIXED_HEIGHT = 740;
+const int FIXED_WIDTH = 1280;
+const int FIXED_HEIGHT = 740;
 /*************************************************************************
  <Function>      DFontWidget
  <Description>   构造函数-构造一个字体预览类对象

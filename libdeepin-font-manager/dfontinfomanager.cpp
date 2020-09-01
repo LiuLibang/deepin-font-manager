@@ -203,7 +203,6 @@ QStringList DFontInfoManager::getAllFontPath(bool isStartup) const
 
     QString output = process.readAllStandardOutput();
     QStringList lines = output.split(QChar('\n'));
-
     for (QString &line : lines) {
         QString filePath = line.remove(QChar(':')).simplified();
         if (filePath.length() > 0 && !pathList.contains(filePath)) {
@@ -753,60 +752,60 @@ QStringList DFontInfoManager::getFontFamilyStyle(const QString &filePah)
  <Return>        QStringList            Description:指定类型的字体
  <Note>          null
 *************************************************************************/
-//QStringList DFontInfoManager::getFonts(DFontInfoManager::FontTYpe type) const
-//{
-//    QStringList fontList;
-//    const FcChar8 *format = reinterpret_cast<const FcChar8 *>("%{=fclist}");
-//    FcPattern *pat = nullptr;
-//    const FcChar8 *opt = nullptr;
-//    switch (type) {
-//    case Chinese:
-//        opt = reinterpret_cast<const FcChar8 *>(":lang=zh");
-//        break;
-//    case MonoSpace:
-//        opt = reinterpret_cast<const FcChar8 *>(":spacing=mono");
-//        break;
-//    case All:
-//        break;
-//    }
+QStringList DFontInfoManager::getFonts(DFontInfoManager::FontTYpe type) const
+{
+    QStringList fontList;
+    const FcChar8 *format = reinterpret_cast<const FcChar8 *>("%{=fclist}");
+    FcPattern *pat = nullptr;
+    const FcChar8 *opt = nullptr;
+    switch (type) {
+    case Chinese:
+        opt = reinterpret_cast<const FcChar8 *>(":lang=zh");
+        break;
+    case MonoSpace:
+        opt = reinterpret_cast<const FcChar8 *>(":spacing=mono");
+        break;
+    case All:
+        break;
+    }
 
-//    if (opt != nullptr) {
-//        pat = FcNameParse(opt);
-//        if (pat == nullptr) {
-//            qDebug() << __FUNCTION__ << " err " << type;
-//            return fontList;
-//        }
-//    } else {
-//        pat = FcPatternCreate();
-//    }
+    if (opt != nullptr) {
+        pat = FcNameParse(opt);
+        if (pat == nullptr) {
+            qDebug() << __FUNCTION__ << " err " << type;
+            return fontList;
+        }
+    } else {
+        pat = FcPatternCreate();
+    }
 
-//    FcObjectSet *os = FcObjectSetBuild(FC_FILE, nullptr);
-//    FcFontSet *fs = FcFontList(nullptr, pat, os);
+    FcObjectSet *os = FcObjectSetBuild(FC_FILE, nullptr);
+    FcFontSet *fs = FcFontList(nullptr, pat, os);
 
-//    if (os)
-//        FcObjectSetDestroy(os);
-//    if (pat)
-//        FcPatternDestroy(pat);
+    if (os)
+        FcObjectSetDestroy(os);
+    if (pat)
+        FcPatternDestroy(pat);
 
-//    if (fs) {
-//        for (int j = 0; j < fs->nfont; j++) {
-//            FcChar8 *s = FcPatternFormat(fs->fonts[j], format);
-//            if (s == nullptr)
-//                continue;
+    if (fs) {
+        for (int j = 0; j < fs->nfont; j++) {
+            FcChar8 *s = FcPatternFormat(fs->fonts[j], format);
+            if (s == nullptr)
+                continue;
 
-//            QString str = QString(reinterpret_cast<char *>(s));
-//            str.remove(": ");
-////            qDebug() << __FUNCTION__ << str;
-//            if (!fontList.contains(str) && !str.isEmpty())
-//                fontList << str;
-//            FcStrFree(s);
-//        }
-//        FcFontSetDestroy(fs);
-//    }
+            QString str = QString(reinterpret_cast<char *>(s));
+            str.remove(": ");
+//            qDebug() << __FUNCTION__ << str;
+            if (!fontList.contains(str) && !str.isEmpty())
+                fontList << str;
+            FcStrFree(s);
+        }
+        FcFontSetDestroy(fs);
+    }
 
-////    FcFini();
-//    return fontList;
-//}
+//    FcFini();
+    return fontList;
+}
 
 /*************************************************************************
  <Function>      getInstFontPath
@@ -872,7 +871,7 @@ void DFontInfoManager::getDefaultPreview(DFontInfo &data)
         if (data == item) {
             data.defaultPreview = item.defaultPreview;
             data.previewLang = item.previewLang;
-            //return;
+            return;
         }
     }
 

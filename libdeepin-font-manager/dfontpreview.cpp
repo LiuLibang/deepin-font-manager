@@ -33,7 +33,15 @@
 #include <fontconfig/fontconfig.h>
 #include <fontconfig/fcfreetype.h>
 
-
+static const QString lowerTextStock = "abcdefghijklmnopqrstuvwxyz";
+static const QString upperTextStock = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+static const QString punctuationTextStock = "0123456789.:,;(*!?')";
+static const int textWidth = 1204;
+const int FIXED_WIDTH = 1280;
+const int FIXED_HEIGHT = 720;
+static QString sampleString = nullptr;
+static QString styleName = nullptr;
+static QHash<QString, QString> contents = {};
 
 /*************************************************************************
  <Function>      DFontPreview
