@@ -104,13 +104,6 @@ TEST_F(TestDFontInfoDialog, checkAutoFeed)
     EXPECT_TRUE(str2.size() == 20) << str2.size();
 }
 
-//adaptiveLengthForNameTitle
-TEST_F(TestDFontInfoDialog, checkAdaptiveLengthForNameTitle)
-{
-
-}
-
-
 //fontinfoArea
 TEST_F(TestDFontInfoDialog, checkfontinfoAreaEventFilter)
 {
@@ -118,6 +111,27 @@ TEST_F(TestDFontInfoDialog, checkfontinfoAreaEventFilter)
 
     dFontInforDialog->m_fontinfoArea->eventFilter(dFontInforDialog->m_fontinfoArea, e);
 }
+
+TEST_F(TestDFontInfoDialog, checkInfoScroolArea)
+{
+    DFontPreviewItemData d2;
+    d2.fontInfo.version = "first";
+    d2.fontInfo.description = "second";
+    QWidget *w2 = new QWidget;
+    DFontInfoDialog *dialog = new DFontInfoDialog(&d2, w2);
+    Q_UNUSED(dialog)
+}
+
+
+
+
+
+
+
+
+
+
+
 
 
 

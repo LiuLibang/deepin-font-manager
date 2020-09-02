@@ -18,4 +18,5 @@ SOURCES += \
     $$PWD/ut_dfontspinnerwidget.cpp \
     $$PWD/ut_dfquickinstallwindow.cpp \
     $$PWD/ut_dsplitlistwidget.cpp \
-    $$PWD/ut_fonticontext.cpp
+    $$PWD/ut_fonticontext.cpp \
+    $$PWD/ut_dfinstallnormalwindow.cpp
