@@ -281,20 +281,20 @@ void DFQuickInstallWindow::InitPreviewFont(DFontInfo fontInfo)
 
         if (styleName.contains("Regular")) {
             preivewFont.setWeight(QFont::Normal);
+        } else if (styleName.contains("ExtraLight")) {
+            preivewFont.setWeight(QFont::ExtraLight);
+        } else if (styleName.contains("ExtraBold")) {
+            preivewFont.setWeight(QFont::ExtraBold);
+        } else if (styleName.contains("DemiBold")) {
+            preivewFont.setWeight(QFont::DemiBold);
         } else if (styleName.contains("Bold")) {
             preivewFont.setWeight(QFont::Bold);
         } else if (styleName.contains("Light")) {
             preivewFont.setWeight(QFont::Light);
         } else if (styleName.contains("Thin")) {
             preivewFont.setWeight(QFont::Thin);
-        } else if (styleName.contains("ExtraLight")) {
-            preivewFont.setWeight(QFont::ExtraLight);
-        } else if (styleName.contains("ExtraBold")) {
-            preivewFont.setWeight(QFont::ExtraBold);
         } else if (styleName.contains("Medium")) {
             preivewFont.setWeight(QFont::Medium);
-        } else if (styleName.contains("DemiBold")) {
-            preivewFont.setWeight(QFont::DemiBold);
         } else if (styleName.contains("Black")) {
             preivewFont.setWeight(QFont::Black);
         }

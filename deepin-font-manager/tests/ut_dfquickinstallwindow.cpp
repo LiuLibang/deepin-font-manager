@@ -49,6 +49,14 @@ protected:
     DFQuickInstallWindow *fqi;
 };
 
+//参数化测试
+class TestcheckInitPreviewFont : public::testing::TestWithParam<QString>
+{
+public:
+    QWidget *w = new QWidget;
+    DFQuickInstallWindow *fqi = new DFQuickInstallWindow(QStringList(), w);
+};
+
 DFontInfo stub_getFontInfoFirst(const QString &filePath)
 {
     Q_UNUSED(filePath)
@@ -174,3 +182,18 @@ TEST_F(TestDFQuickInstallWindow, checkOnFontInstallFinishedSecond)
 
     EXPECT_TRUE(spy.count() == 1);
 }
+
+TEST_P(TestcheckInitPreviewFont, checkInitPreviewFont)
+{
+    QString n =  GetParam();
+    DFontInfo f;
+    f.styleName = QString(n);
+
+    fqi->InitPreviewFont(f);
+}
+
+INSTANTIATE_TEST_CASE_P(HandleTrueReturn, TestcheckInitPreviewFont, testing::Values("Italic", "Regular", "ExtraLight", "ExtraBold",
+                                                                                    "DemiBold", "Bold", "Light", "Thin", "Medium", "Black"));
+
+
+

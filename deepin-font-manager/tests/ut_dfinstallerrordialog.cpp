@@ -96,6 +96,15 @@ bool stub_isSystemFont(DFontInfo &f)
 
 }
 
+bool stub_isSystemFontFalse(DFontInfo &f)
+{
+    Q_UNUSED(f)
+
+    return false;
+
+}
+
+
 }
 
 TEST_F(TestDFInstallErrorDialog, checkGetErrorFontCheckedCount)
@@ -103,6 +112,47 @@ TEST_F(TestDFInstallErrorDialog, checkGetErrorFontCheckedCount)
     int count = DFErrDialog->getErrorFontCheckedCount();
     EXPECT_TRUE(count == 0);
 }
+
+TEST_F(TestDFInstallErrorDialog, checkInitDataError)
+{
+    Stub s;
+    s.set(ADDR(DFontInfoManager, getFontInfo), stub_getFontInfoError);
+
+    DFErrDialog->m_errorInstallFiles.append("first");
+
+    DFErrDialog->initData();
+}
+
+TEST_F(TestDFInstallErrorDialog, checkInitDataInstalled)
+{
+
+    Stub s;
+    s.set(ADDR(DFontInfoManager, getFontInfo), stub_getFontInfoInstalled);
+
+    Stub s1;
+    s1.set(ADDR(DFInstallNormalWindow, isSystemFont), stub_isSystemFontFalse);
+
+    DFErrDialog->m_errorInstallFiles.append("first");
+
+    DFErrDialog->initData();
+}
+
+
+TEST_F(TestDFInstallErrorDialog, checkInitDataSystem)
+{
+
+    Stub s;
+    s.set(ADDR(DFInstallNormalWindow, isSystemFont), stub_isSystemFont);
+
+    Stub s2;
+    s2.set(ADDR(DFontInfoManager, getFontInfo), stub_getFontInfo);
+
+    DFErrDialog->m_errorInstallFiles.append("first");
+
+    DFErrDialog->initData();
+}
+
+
 
 TEST_F(TestDFInstallErrorDialog, checkAddDataError)
 {
@@ -124,7 +174,7 @@ TEST_F(TestDFInstallErrorDialog, checkAddDataInstalled)
     s.set(ADDR(DFontInfoManager, getFontInfo), stub_getFontInfoInstalled);
 
     Stub s1;
-    s1.set(ADDR(DFInstallNormalWindow, isSystemFont), stub_isSystemFont);
+    s1.set(ADDR(DFInstallNormalWindow, isSystemFont), stub_isSystemFontFalse);
 
     DFErrDialog->addData(list, list2, list2, list2);
 }

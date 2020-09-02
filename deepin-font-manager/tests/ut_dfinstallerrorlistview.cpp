@@ -145,12 +145,65 @@ TEST_F(TestDFInstallErrorListView, checkKeyPressEvent)
 
 }
 
-//TEST_F(TestDFInstallErrorListView, checkLengthAutoFeed)
-//{
-//    QPainter *p = new QPainter;
-//    QString str = iEListview->m_errorListItemDelegate->lengthAutoFeed(p, "asdsadasda", 50);
-//    qDebug() << str << endl;
-//}
+TEST_F(TestDFInstallErrorListView, checkLengthAutoFeed)
+{
+    QPainter *p = new QPainter;
+
+    QString str;
+    str.fill('a', 200);
+
+
+    str = iEListview->m_errorListItemDelegate->lengthAutoFeed(p, str, 50);
+    qDebug() << str << endl;
+}
+
+TEST_F(TestDFInstallErrorListView, checkSortModelIndexList)
+{
+    DFInstallErrorItemModel model1;
+    model1.bIsNormalUserFont = true;
+    model1.bChecked = false;
+    iEListview->m_installErrorFontModelList.append(model1);
+
+    model1.bChecked = true;
+    iEListview->m_installErrorFontModelList.append(model1);
+
+    model1.bSelectable = false;
+    iEListview->m_installErrorFontModelList.append(model1);
+
+    iEListview->initErrorListData();
+
+    QModelIndex index;
+    QModelIndexList indexList;
+
+    index = iEListview->getErrorListSourceModel()->index(0, 0);
+    iEListview->m_errorListItemDelegate->paint(p, option, index);
+    indexList.append(index);
+
+
+    index = iEListview->getErrorListSourceModel()->index(1, 0);
+    iEListview->m_errorListItemDelegate->paint(p, option, index);
+    indexList.append(index);
+
+    iEListview->sortModelIndexList(indexList);
+
+    EXPECT_TRUE(indexList.first().row() == 1);
+
+}
+
+
+
+TEST_F(TestDFInstallErrorListView, checkEventFilter)
+{
+    QFocusEvent *focusOutEvent = new QFocusEvent(QEvent::FocusOut);
+
+    iEListview->eventFilter(iEListview, focusOutEvent);
+    EXPECT_FALSE(iEListview->m_IsTabFocus);
+
+    QFocusEvent *focusInEvent = new QFocusEvent(QEvent::FocusIn);
+
+    iEListview->eventFilter(iEListview, focusInEvent);
+    EXPECT_TRUE(iEListview->m_IsTabFocus);
+}
 
 
 

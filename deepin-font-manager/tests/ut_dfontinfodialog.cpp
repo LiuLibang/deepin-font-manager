@@ -87,13 +87,29 @@ TEST_F(TestDFontInfoDialog, checkAutoFeed)
     str.fill('a', 100);
     qDebug() << str << endl;
     str = dFontInforDialog->AutoFeed(str);
+    //进行处理之后字符串长度发生变化
     EXPECT_TRUE(str.size() != 100);
+
+
+    str.fill('a', 300);
+    qDebug() << str << endl;
+    str = dFontInforDialog->AutoFeed(str);
+    //进行处理之后字符串长度发生变化
+    EXPECT_TRUE(str.size() != 300);
+
 
     QString str2;
     str2.fill('a', 20);
     str2 = dFontInforDialog->AutoFeed(str2);
     EXPECT_TRUE(str2.size() == 20) << str2.size();
 }
+
+//adaptiveLengthForNameTitle
+TEST_F(TestDFontInfoDialog, checkAdaptiveLengthForNameTitle)
+{
+
+}
+
 
 //fontinfoArea
 TEST_F(TestDFontInfoDialog, checkfontinfoAreaEventFilter)
