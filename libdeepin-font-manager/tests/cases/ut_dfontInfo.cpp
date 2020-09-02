@@ -274,32 +274,6 @@ TEST_F(TestDFontInfoGetFileNames, getAllFontPath_is_normal)
     //第一次启动时，获取字体的数目应该为用户字体文件夹下所有字体的数目加上系统字体文件夹下所有字体的数目,
     returnList.clear();
     returnList = dfm->getAllFontPath(true);
-//    int count = dfm->getFileNames("/usr/share/fonts/").count() + dfm->getFileNames(QDir::homePath() + "/.local/share/fonts/").count();
-
-//    QProcess process;
-//    process.start("find /usr/share/fonts/ -name *.ttf");
-//    process.waitForFinished(-1);
-
-//    QString output = process.readAllStandardOutput();
-//    QStringList lines = output.split(QChar('\n'));
-
-//    process.start("find /usr/share/fonts/ -name *.TTF");
-//    process.waitForFinished(-1);
-//    output = process.readAllStandardOutput();
-//    lines.append(output.split(QChar('\n')));
-
-//    process.start("find /usr/share/fonts/ -name *.ttc");
-//    process.waitForFinished(-1);
-//    output = process.readAllStandardOutput();
-//    lines.append(output.split(QChar('\n')));
-
-//    process.start("find /usr/share/fonts/ -name *.pfb");
-//    process.waitForFinished(-1);
-//    output = process.readAllStandardOutput();
-//    lines.append(output.split(QChar('\n')));
-
-//    std::cout << "++++++++++++++++++++++++++" << lines.count();
-//    EXPECT_EQ(lines.count() - 4 +  dfm->getFileNames(QDir::homePath() + "/.local/share/fonts/").count(), returnList.count());
 }
 
 TEST_F(TestgetFontType, getFontType_is_normal)
@@ -323,13 +297,12 @@ TEST_F(TestgetFontType, getFontType_is_normal)
 TEST_P(TestcheckStyleName, checkStyleName_Is_Normal)
 {
     QString n =  GetParam();
-//    std::cout << n << "++++++++++++++++++" << std::endl;
     DFontInfo f;
     f.styleName = "?";
     f.psname = QString(n);
-//    std::cout << f.psname.toStdString() << f.styleName.toStdString() << "++++++++++++++++++" << std::endl;
+
     dfm->checkStyleName(f);
-//    std::cout << f.psname.toStdString() << f.styleName.toStdString() << "++++++++++++++++++" << std::endl;
+
     ASSERT_EQ(f.psname, f.styleName);
 }
 
@@ -419,8 +392,6 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_normalfont_is_normal)
     originPath = QDir::homePath() + "/Desktop/1048字体/Addictype-Regular.otf";
     QFileInfo dir(originPath);
     target = sysDir + "/asd/" + dir.fileName();
-//    std::cout << target.toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
-//    std::cout << dfm->getInstFontPath(originPath, "asd").toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
 
     EXPECT_EQ(target, dfm->getInstFontPath(originPath, "asd"));
 }
@@ -430,8 +401,6 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_systemfont_is_normal)
     originPath = "/usr/share/fonts/truetype/noto/NotoSansLinearB-Regular.ttf";
     QFileInfo dir(originPath);
     target = sysDir + "/asd/" + dir.fileName();
-//    std::cout << target.toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
-//    std::cout << dfm->getInstFontPath(originPath, "asd").toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
 
     EXPECT_EQ(originPath, dfm->getInstFontPath(originPath, "asd"));
 }
@@ -443,8 +412,6 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_normalIntalledfont_is_normal)
 
     QFileInfo dir(originPath);
     target = sysDir + "/asd/" + dir.fileName();
-//    std::cout << target.toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
-//    std::cout << dfm->getInstFontPath(originPath, "asd").toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
 
     EXPECT_EQ(originPath, dfm->getInstFontPath(originPath, "asd"));
 }
@@ -456,8 +423,6 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_errorfam_is_normal)
 
     QFileInfo dir(originPath);
     target = sysDir + "/" + dir.baseName() + "/" + dir.fileName();
-    std::cout << target.toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
-    std::cout << dfm->getInstFontPath(originPath, QString()).toStdString() << "+++++++++++++++++++++++++++++++++++++" << std::endl;
 
     EXPECT_EQ(target, dfm->getInstFontPath(originPath, QString()));
 }
@@ -505,13 +470,13 @@ TEST_F(TestCheckgetDefaultPreview, get_Chinese_DefaultPreview)
     //dfm->refreshList();
     DFontInfo fontInfo = dfm->getFontInfo("/usr/share/fonts/fonts-cesi/CESI_XBS_GB13000.TTF");
     dfm->getDefaultPreview(fontInfo);
-    std::cout << fontInfo.previewLang << "+++++++++++++++++++++++++++++++++++++" << std::endl;
+
     //这个标志符表示中文字体,显示默认的中文内容.
     EXPECT_EQ(1,  fontInfo.previewLang);
 
     fontInfo = dfm->getFontInfo("/usr/share/fonts/fonts-cesi/CESI_KT_GB13000.TTF");
     dfm->getDefaultPreview(fontInfo);
-    std::cout << fontInfo.previewLang << "+++++++++++++++++++++++++++++++++++++" << std::endl;
+
     //这个标志符表示中文字体,显示默认的中文内容.
     EXPECT_EQ(1,  fontInfo.previewLang);
 
@@ -523,7 +488,7 @@ TEST_F(TestCheckgetDefaultPreview, get_English_DefaultPreview)
     //dfm->refreshList();
     DFontInfo fontInfo = dfm->getFontInfo("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf");
     dfm->getDefaultPreview(fontInfo);
-    std::cout << fontInfo.previewLang << "+++++++++++++++++++++++++++++++++++++" << std::endl;
+
     //这个标志符表示中文字体,显示默认的英文内容.
     EXPECT_EQ(2,  fontInfo.previewLang);
 }
@@ -532,10 +497,10 @@ TEST_F(TestCheckgetDefaultPreview, get_English_DefaultPreview)
 TEST_F(TestCheckgetFontFamilyStyle, get_Normal_FamilyStyle)
 {
     QStringList str = dfm->getFontFamilyStyle("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf");
-    EXPECT_EQ(true, str.contains("Liberation Sans")) << L"++++++++getFontFamilyStyle isnormal font familyname is " << str.contains("Liberation Sans");
+    EXPECT_EQ(true, str.contains("Liberation Sans")) << "++++++++getFontFamilyStyle isnormal font familyname is " << str.contains("Liberation Sans");
 
     str = dfm->getFontFamilyStyle("/usr/share/fonts/truetype/msttcorefonts/Georgia.ttf");
-    EXPECT_EQ(true, str.contains("Georgia")) << L"++++++++getFontFamilyStyle isnormal font familyname is " << str.contains("Liberation Sans");
+    EXPECT_EQ(true, str.contains("Georgia")) << "++++++++getFontFamilyStyle isnormal font familyname is " << str.contains("Liberation Sans");
 }
 
 
