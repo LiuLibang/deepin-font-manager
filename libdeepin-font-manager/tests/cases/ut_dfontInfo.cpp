@@ -1,5 +1,6 @@
 #include "dfontinfomanager.h"
 
+#include "../third-party/stub/stub.h"
 #include <gtest/gtest.h>
 #include <gmock/gmock-matchers.h>
 
@@ -54,32 +55,12 @@ public:
     DFontInfoManager *dfm = nullptr;
     //任何一个存在字体的路径
     QString path = "/usr/share/fonts/truetype/lohit-devanagari";
-
     //任何不存在的一个路径，用以提供判断
     QString path2 = "/usr/share/abc";
-
-    //
     QString path3 = "/usr/share/fonts/X11/Type1";
-
     QStringList returnList;
 };
 
-
-class TestgetFontType : public testing::Test
-{
-public:
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-//        delete dfm;
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-    DFontInfo fontinfo;
-};
 
 //参数化测试
 class TestcheckStyleName : public::testing::TestWithParam<QString>
@@ -88,58 +69,8 @@ public:
     DFontInfoManager *dfm = DFontInfoManager::instance();
 };
 
-class TestgetFontInfo : public testing::Test
-{
-public:
-
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-    DFontInfo fontinfo;
-};
-
-class TestCheckGetAllChineseFontList : public testing::Test
-{
-public:
-
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-    DFontInfo fontinfo;
-};
-
-class TestCheckGetAllMonoFontList : public testing::Test
-{
-public:
-
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-};
-
 //getInstFontPath
-class TestgetInstFontPath : public testing::Test
+class TestDFontInfoManager : public testing::Test
 {
 public:
 
@@ -155,72 +86,61 @@ public:
     DFontInfoManager *dfm = nullptr;
     QString originPath;
     QString familyName;
+    DFontInfo fontinfo;
+    QString filepath = QString();
     QString sysDir = QDir::homePath() + "/.local/share/fonts";
     QString target;
 };
 
-class TestCheckFontIsInstalled :  public testing::Test
+DFontInfo stub_getFontinfo()
 {
+    DFontInfo info;
+    info.psname = "first";
 
-public:
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-};
-
-class TestCheckCurFonFamily : public testing::Test
-{
-public:
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-    QString filepath = QString();
-};
-
-class TestCheckgetDefaultPreview : public testing::Test
-{
-public:
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-};
-
-class TestCheckgetFontFamilyStyle : public testing::Test
-{
-public:
-    void SetUp() override
-    {
-        dfm = DFontInfoManager::instance();
-    }
-    void TearDown() override
-    {
-
-    }
-public:
-    DFontInfoManager *dfm = nullptr;
-};
+    return info;
 }
+
+}
+
+//refreshList
+TEST_F(TestDFontInfoManager, checkRefreshList)
+{
+    Stub s;
+    s.set(ADDR(DFontInfoManager, getFontInfo), stub_getFontinfo);
+
+    QStringList list;
+    list << "first";
+
+    dfm->refreshList(list);
+
+    DFontInfo info;
+    info.psname = "first";
+
+    EXPECT_TRUE(dfm->isFontInstalled(info));
+
+    dfm->refreshList(QStringList());
+}
+
+//getFontPath
+TEST_F(TestDFontInfoManager, checkGetFontPath)
+{
+    QString file;
+    file = dfm->getFontPath();
+
+    EXPECT_FALSE(file.isNull());
+//    EXPECT_TRUE(list.count() != 0);
+
+}
+
+TEST_F(TestDFontInfoManager, checkGetFonts)
+{
+    //返回值不稳定无法判断
+    EXPECT_TRUE(dfm->getFonts(DFontInfoManager::All).count() != 0);
+    EXPECT_TRUE(dfm->getFonts(DFontInfoManager::Chinese).count() != 0);
+    EXPECT_TRUE(dfm->getFonts(DFontInfoManager::MonoSpace).count() != 0);
+
+}
+
 
 TEST_F(TestDFontInfo, equalsign_is_normal)
 {
@@ -276,7 +196,7 @@ TEST_F(TestDFontInfoGetFileNames, getAllFontPath_is_normal)
     returnList = dfm->getAllFontPath(true);
 }
 
-TEST_F(TestgetFontType, getFontType_is_normal)
+TEST_F(TestDFontInfoManager, getFontType_is_normal)
 {
     EXPECT_EQ("TrueType", dfm->getFontType("/usr/share/fonts/truetype/liberation/LiberationMono-Italic.ttf"));
 
@@ -311,14 +231,14 @@ INSTANTIATE_TEST_CASE_P(HandleTrueReturn, TestcheckStyleName, testing::Values("R
                                                                               "ExtraCondensed", "Condensed", "SemiCondensed", "Unstretched",
                                                                               "SemiExpanded", "Expanded", "ExtraExpanded", "UltraExpanded"));
 
-TEST_F(TestgetFontInfo, getErrorFontInfo_is_normal)
+TEST_F(TestDFontInfoManager, getErrorFontInfo_is_normal)
 {
     //系统字体应该为已安装,执行函数得到的结果已安装为false,出现错误.
     fontinfo = dfm->getFontInfo(QDir::homePath() + "/Desktop/abc.ttf");
     EXPECT_EQ(true, fontinfo.isError);
 }
 
-TEST_F(TestgetFontInfo, getDefaultPreview_is_normal)
+TEST_F(TestDFontInfoManager, getDefaultPreview_is_normal)
 {
     qint8 Long = 1;
     QString str = dfm->getDefaultPreview(QDir::homePath() + "/Desktop/abc.ttf", Long);
@@ -328,7 +248,7 @@ TEST_F(TestgetFontInfo, getDefaultPreview_is_normal)
 
 
 //getFontInfo 函数出错 获取系统字体信息时,安装状态被检测为未安装 20200813
-TEST_F(TestgetFontInfo, getSystemFontInfo_Is_normal)
+TEST_F(TestDFontInfoManager, getSystemFontInfo_Is_normal)
 {
     //系统字体应该为已安装,执行函数得到的结果已安装为false,出现错误.
     fontinfo = dfm->getFontInfo("/usr/share/fonts/truetype/noto/NotoSansTamil-Bold.ttf");
@@ -339,7 +259,7 @@ TEST_F(TestgetFontInfo, getSystemFontInfo_Is_normal)
 }
 
 //这个测试不稳定,取决于这个字体有没有被安装过,以后需要进行修改***
-TEST_F(TestgetFontInfo, getInstalledFontInfo_is_normal)
+TEST_F(TestDFontInfoManager, getInstalledFontInfo_is_normal)
 {
     //wolves.ttf是安装过的一个字体 , 检查结果没有问题
     fontinfo = dfm->getFontInfo(QDir::homePath() + "/Desktop/1048字体/wolves.ttf");
@@ -349,7 +269,7 @@ TEST_F(TestgetFontInfo, getInstalledFontInfo_is_normal)
 }
 
 
-TEST_F(TestgetFontInfo, getChineseFontInfo_is_normal)
+TEST_F(TestDFontInfoManager, getChineseFontInfo_is_normal)
 {
     fontinfo = dfm->getFontInfo("/usr/share/fonts/fonts-cesi/CESI_FS_GB2312.TTF");
     EXPECT_EQ(false, fontinfo.isError);
@@ -357,7 +277,7 @@ TEST_F(TestgetFontInfo, getChineseFontInfo_is_normal)
     EXPECT_EQ(FONT_LANG_CHINESE, fontinfo.previewLang);
 }
 
-TEST_F(TestCheckGetAllChineseFontList, getAllChineseFontCount_is_normal)
+TEST_F(TestDFontInfoManager, getAllChineseFontCount_is_normal)
 {
     int count = dfm->getAllChineseFontPath().count();
 
@@ -372,7 +292,7 @@ TEST_F(TestCheckGetAllChineseFontList, getAllChineseFontCount_is_normal)
 }
 
 
-TEST_F(TestCheckGetAllMonoFontList, getAllMonoFontCount_is_normal)
+TEST_F(TestDFontInfoManager, getAllMonoFontCount_is_normal)
 {
     int count = dfm->getAllMonoSpaceFontPath().count();
 
@@ -387,7 +307,7 @@ TEST_F(TestCheckGetAllMonoFontList, getAllMonoFontCount_is_normal)
 }
 
 //getInstFontPath函数正常未安装字体检测
-TEST_F(TestgetInstFontPath, getInstallFontPath_normalfont_is_normal)
+TEST_F(TestDFontInfoManager, getInstallFontPath_normalfont_is_normal)
 {
     originPath = QDir::homePath() + "/Desktop/1048字体/Addictype-Regular.otf";
     QFileInfo dir(originPath);
@@ -396,7 +316,7 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_normalfont_is_normal)
     EXPECT_EQ(target, dfm->getInstFontPath(originPath, "asd"));
 }
 //getInstFontPath函数系统字体字体检测
-TEST_F(TestgetInstFontPath, getInstallFontPath_systemfont_is_normal)
+TEST_F(TestDFontInfoManager, getInstallFontPath_systemfont_is_normal)
 {
     originPath = "/usr/share/fonts/truetype/noto/NotoSansLinearB-Regular.ttf";
     QFileInfo dir(originPath);
@@ -406,7 +326,7 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_systemfont_is_normal)
 }
 
 //getInstFontPath函数已安装字体字体字体检测
-TEST_F(TestgetInstFontPath, getInstallFontPath_normalIntalledfont_is_normal)
+TEST_F(TestDFontInfoManager, getInstallFontPath_normalIntalledfont_is_normal)
 {
     originPath =  QDir::homePath() + "/.local/share/fonts/Yikatu/yikatu.ttf";
 
@@ -417,7 +337,7 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_normalIntalledfont_is_normal)
 }
 
 //getInstFontPath函数字体familyname为空检测
-TEST_F(TestgetInstFontPath, getInstallFontPath_errorfam_is_normal)
+TEST_F(TestDFontInfoManager, getInstallFontPath_errorfam_is_normal)
 {
     originPath =  QDir::homePath() + "/Desktop/1048字体/Addictype-Regular.otf";
 
@@ -428,36 +348,36 @@ TEST_F(TestgetInstFontPath, getInstallFontPath_errorfam_is_normal)
 }
 
 //isFontInstalled检测已安装字体是否已安装
-TEST_F(TestCheckFontIsInstalled, fontIsInstalled_installedFont_isnormal)
+TEST_F(TestDFontInfoManager, fontIsInstalled_installedFont_isnormal)
 {
 //因为static成员 dataList没有其他办法访问,所以先调用这个函数
-//    dfm->refreshList();
+    dfm->refreshList(QStringList());
     DFontInfo fontInfo = dfm->getFontInfo("/usr/share/fonts/truetype/noto/NotoSansLinearB-Regular.ttf");
 
     EXPECT_EQ(true, dfm->isFontInstalled(fontInfo));
 }
 
 //isFontInstalled检测未安装字体是否已安装
-TEST_F(TestCheckFontIsInstalled, fontIsInstalled_notInstalledFont_isnormal)
+TEST_F(TestDFontInfoManager, fontIsInstalled_notInstalledFont_isnormal)
 {
 //因为static成员 dataList没有其他办法访问,所以先调用这个函数
-//    dfm->refreshList();
+    dfm->refreshList(QStringList());
     DFontInfo fontInfo = dfm->getFontInfo(QDir::homePath() + "/Desktop/1048字体/食物.ttf");
 
     EXPECT_EQ(false, dfm->isFontInstalled(fontInfo));
 }
 
 //isFontInstalled检测异常字体是否已安装
-TEST_F(TestCheckFontIsInstalled, fontIsInstalled_errorFont_isnormal)
+TEST_F(TestDFontInfoManager, fontIsInstalled_errorFont_isnormal)
 {
 //因为static成员 dataList没有其他办法访问,所以先调用这个函数
-//    dfm->refreshList();
+    dfm->refreshList(QStringList());
     DFontInfo fontInfo;
     EXPECT_EQ(false, dfm->isFontInstalled(fontInfo));
 }
 
 //getCurrentFontFamily检测正在使用的系统字体
-TEST_F(TestCheckCurFonFamily, getFFamStyle)
+TEST_F(TestDFontInfoManager, getFFamStyle)
 {
     // 查看当前系统中设置的字体名,将之与函数返回值进行比较
     QString str = "Noto Sans CJK KR";
@@ -465,7 +385,7 @@ TEST_F(TestCheckCurFonFamily, getFFamStyle)
 }
 
 //getDefaultPreview 检测中文字体的默认预览效果是否正常 在系统字体为英文的环境下出错 20200814 中文字体预览效果标志位不为1
-TEST_F(TestCheckgetDefaultPreview, get_Chinese_DefaultPreview)
+TEST_F(TestDFontInfoManager, get_Chinese_DefaultPreview)
 {
     //dfm->refreshList();
     DFontInfo fontInfo = dfm->getFontInfo("/usr/share/fonts/fonts-cesi/CESI_XBS_GB13000.TTF");
@@ -483,7 +403,7 @@ TEST_F(TestCheckgetDefaultPreview, get_Chinese_DefaultPreview)
 }
 
 //getDefaultPreview 检测英文字体的默认预览效果是否正常
-TEST_F(TestCheckgetDefaultPreview, get_English_DefaultPreview)
+TEST_F(TestDFontInfoManager, get_English_DefaultPreview)
 {
     //dfm->refreshList();
     DFontInfo fontInfo = dfm->getFontInfo("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf");
@@ -494,13 +414,13 @@ TEST_F(TestCheckgetDefaultPreview, get_English_DefaultPreview)
 }
 
 //getFontFamilyStyle 查看系统个性化中的字体设置,现实的是字体familyname,与结果进行对比
-TEST_F(TestCheckgetFontFamilyStyle, get_Normal_FamilyStyle)
+TEST_F(TestDFontInfoManager, get_Normal_FamilyStyle)
 {
     QStringList str = dfm->getFontFamilyStyle("/usr/share/fonts/truetype/liberation/LiberationSans-Bold.ttf");
-    EXPECT_EQ(true, str.contains("Liberation Sans")) << "++++++++getFontFamilyStyle isnormal font familyname is " << str.contains("Liberation Sans");
+    EXPECT_EQ(true, str.contains("Liberation Sans"));
 
     str = dfm->getFontFamilyStyle("/usr/share/fonts/truetype/msttcorefonts/Georgia.ttf");
-    EXPECT_EQ(true, str.contains("Georgia")) << "++++++++getFontFamilyStyle isnormal font familyname is " << str.contains("Liberation Sans");
+    EXPECT_EQ(true, str.contains("Georgia"));
 }
 
 
