@@ -19,4 +19,5 @@ SOURCES += \
     $$PWD/cases/ut_dfontwidget.cpp \
     $$PWD/cases/ut_dfontpreviewitemdef.cpp \
     $$PWD/cases/ut_dsqliteutil.cpp \
-    $$PWD/cases/ut_dcopyfilesmanager.cpp
+    $$PWD/cases/ut_dcopyfilesmanager.cpp \
+    $$PWD/cases/ut_signalmanager.cpp

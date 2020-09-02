@@ -27,6 +27,7 @@ protected:
     QString tbname = "t_fontmanager";
     QMap<QString, QString> data;
 };
+
 }
 
 TEST_F(TestDSqliteUtil, checkEscapeString)
@@ -36,12 +37,38 @@ TEST_F(TestDSqliteUtil, checkEscapeString)
     EXPECT_EQ("first", fs->escapeString("first"));
 }
 
+TEST_F(TestDSqliteUtil, checkAddRecord)
+{
+    fs->delAllRecords();
+
+    QMap<QString, QString> data;
+    data.insert("isCollected", "1");
+    EXPECT_TRUE(fs->addRecord(data));
+
+    QMap<QString, QString> data1;
+    data1.insert("isCollected", "2");
+
+    EXPECT_TRUE(fs->updateRecord(data, data1));
+
+    QList<QString> list;
+    QList<QMap<QString, QString>> datalist;
+    QMap<QString, QString> data2;
+    list << "isCollected";
+
+    EXPECT_TRUE(fs->findRecords(list, &datalist));
+
+
+    EXPECT_TRUE(fs->delRecord(data1));
+
+
+    EXPECT_FALSE(fs->addRecord(data1, ""));
+}
 
 TEST_F(TestDSqliteUtil, checkAddFontinfo)
 {
     QList<DFontPreviewItemData> fontList;
     fs->addFontInfo(fontList);
-
+    fs->delAllRecords();
     DFontPreviewItemData data;
     fontList << data;
     fs->addFontInfo(fontList);
@@ -49,6 +76,8 @@ TEST_F(TestDSqliteUtil, checkAddFontinfo)
     EXPECT_TRUE(fs->getMaxFontId());
     fs->delAllRecords();
     fs->finish();
+
+    fs->addFontInfo(fontList, "");
 }
 
 TEST_F(TestDSqliteUtil, checkUpdateFontInfo)
@@ -56,6 +85,9 @@ TEST_F(TestDSqliteUtil, checkUpdateFontInfo)
     QList<DFontPreviewItemData> fontList;
 
     DFontPreviewItemData data;
+
+    fs->delAllRecords();
+
     fontList << data;
     fs->addFontInfo(fontList);
 
@@ -65,6 +97,7 @@ TEST_F(TestDSqliteUtil, checkUpdateFontInfo)
     fs->updateFontInfo(fontList, "isCollected");
 
     fs->updateFontInfo(fontList, "isMonoSpace");
+    fs->updateFontInfo(fontList, "isMonoSpace", "");
     fs->delAllRecords();
 }
 
@@ -87,9 +120,12 @@ TEST_F(TestDSqliteUtil, checkGetInstalledFontsPath)
 //删除记录函数可能出错，删除一条记录后数目不对
 TEST_F(TestDSqliteUtil, checkDeleteFontInfo)
 {
+
     QList<DFontPreviewItemData> fontList;
     DFontPreviewItemData data;
     fontList << data;
+    fs->delAllRecords();
+
     fs->addFontInfo(fontList);
     EXPECT_TRUE(fs->getRecordCount() == 1) << fs->getRecordCount() ;
     qDebug() << fs->getRecordCount();
@@ -100,12 +136,12 @@ TEST_F(TestDSqliteUtil, checkDeleteFontInfo)
 
 TEST_F(TestDSqliteUtil, checkFindAllRecords)
 {
-    fs->delAllRecords();
-
     QList<DFontPreviewItemData> fontList;
     DFontPreviewItemData data;
     data.fontInfo.psname = "first";
     fontList << data;
+    fs->delAllRecords();
+
     fs->addFontInfo(fontList);
 
     QList<QMap<QString, QString>> recordList;
@@ -114,10 +150,9 @@ TEST_F(TestDSqliteUtil, checkFindAllRecords)
     fs->findAllRecords(keyList, recordList);
 
     EXPECT_TRUE(recordList.count() == 1);
+
+    EXPECT_FALSE(fs->findAllRecords(keyList, recordList, ""));
 }
-
-
-
 
 TEST_F(TestDSqliteUtil, checkDelAllRecords)
 {
@@ -126,6 +161,18 @@ TEST_F(TestDSqliteUtil, checkDelAllRecords)
 }
 
 
+TEST_F(TestDSqliteUtil, checkDelAllRecordsErr)
+{
+
+    EXPECT_FALSE(fs->delAllRecords(""));
+}
+
+
+TEST_F(TestDSqliteUtil, checkFinish)
+{
+    fs->m_query = nullptr;
+    fs->finish();
+}
 
 
 
