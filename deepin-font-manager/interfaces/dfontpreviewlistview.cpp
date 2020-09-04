@@ -2019,9 +2019,11 @@ void DFontPreviewListView::onEnableBtnClicked(const QModelIndexList &itemIndexes
             message = DApplication::translate("MessageManager", "The fonts have been deactivated");
         }
     }
+
     //禁用字体大于零
-    if (count > 0)
+    if (count > 0) {
         DMessageManager::instance()->sendMessage(this->m_parentWidget, QIcon("://ok.svg"), message);
+    }
 
     qDebug() << __FUNCTION__ << " after " << currModelIndex().row() << currentIndex().row();
     Q_EMIT rowCountChanged();

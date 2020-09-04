@@ -496,7 +496,6 @@ void DFInstallNormalWindow::batchInstall()
 
     m_fontManager->setType(DFontManager::Install);
 
-
     m_fontManager->setInstallFileList(installListWithFamliyName);
     m_fontManager->start();
 }
@@ -531,6 +530,7 @@ void DFInstallNormalWindow::batchReInstall(const QStringList &reinstallFiles)
                 //delete the font file first
                 DFontInfo fi = m_fontInfoManager->getFontInfo(it);
                 QString filePath = DFMDBManager::instance()->isFontInfoExist(fi);
+                qDebug() << QFileInfo(filePath).fileName() << QFileInfo(it).fileName() << endl;
                 if (QFileInfo(filePath).fileName() == QFileInfo(it).fileName()) {
 //                    qDebug() << __FUNCTION__ << "same file " << it << " will be overrided ";
                     continue;
