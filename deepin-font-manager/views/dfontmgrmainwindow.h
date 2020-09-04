@@ -7,7 +7,7 @@
 #include "signalmanager.h"
 #include "dsplitlistwidget.h"
 #include "views/dfdeletedialog.h"
-
+#include "utils.h"
 #include <QShortcut>
 
 #include <DFrame>
@@ -15,7 +15,72 @@
 #include <QResizeEvent>
 #include <QScreen>
 
+#include <QHBoxLayout>
+#include <QShortcut>
+#include <QFileSystemWatcher>
+#include <QDBusConnection>
+
+#include <DApplication>
+#include <DApplicationHelper>
+#include <DFontSizeManager>
+#include <DFileDialog>
+#include <DIconButton>
+#include <DLabel>
+#include <DLineEdit>
+#include <DLog>
+#include <DMenu>
+#include <DSearchEdit>
+#include <DSlider>
+#include <DSplitter>
+#include <DTitlebar>
+#include <DWidgetUtil>
+#include <DDesktopServices>
+#include <DMessageManager>
+
+#include <unistd.h>
+
 DWIDGET_USE_NAMESPACE
+
+class DFontMgrMainWindowPrivate
+{
+public:
+    DFontMgrMainWindowPrivate(DFontMgrMainWindow *q)
+        : settingsQsPtr(new QSettings(QDir(Utils::getConfigPath()).filePath("config.conf"),
+                                      QSettings::IniFormat))
+        , q_ptr(q)
+    {
+    }
+
+    //~DFontMgrMainWindowPrivate() {}
+    QWidget *titleActionArea {nullptr};
+    DIconButton *addFontButton {nullptr};
+    DSearchEdit *searchFontEdit {nullptr};
+
+    QWidget *fontShowArea {nullptr};
+
+    //Shadow line of StateBar
+    DHorizontalLine  *sbarShadowLine {nullptr};
+
+    QWidget *stateBar {nullptr};
+    DLineEdit *textInputEdit {nullptr};
+    DSlider *fontScaleSlider {nullptr};
+    DLabel *fontSizeLabel {nullptr};
+
+    DSplitter *mainWndSpliter {nullptr};
+    QWidget *leftBarHolder {nullptr};
+    QWidget *rightViewHolder {nullptr};
+
+    // Menu
+    DMenu *toolBarMenu {nullptr};
+    DMenu *rightKeyMenu {nullptr};
+
+    DSplitListWidget *leftSiderBar {nullptr};
+
+    QScopedPointer<QSettings> settingsQsPtr;
+    DFontMgrMainWindow *q_ptr;
+
+    Q_DECLARE_PUBLIC(DFontMgrMainWindow)
+};
 
 /*
  * TODO:

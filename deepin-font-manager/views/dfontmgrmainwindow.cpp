@@ -8,70 +8,7 @@
 #include "views/dfontinfodialog.h"
 #include "views/dfquickinstallwindow.h"
 
-#include <QHBoxLayout>
-#include <QShortcut>
-#include <QFileSystemWatcher>
-#include <QDBusConnection>
 
-#include <DApplication>
-#include <DApplicationHelper>
-#include <DFontSizeManager>
-#include <DFileDialog>
-#include <DIconButton>
-#include <DLabel>
-#include <DLineEdit>
-#include <DLog>
-#include <DMenu>
-#include <DSearchEdit>
-#include <DSlider>
-#include <DSplitter>
-#include <DTitlebar>
-#include <DWidgetUtil>
-#include <DDesktopServices>
-#include <DMessageManager>
-
-#include <unistd.h>
-
-class DFontMgrMainWindowPrivate
-{
-public:
-    DFontMgrMainWindowPrivate(DFontMgrMainWindow *q)
-        : settingsQsPtr(new QSettings(QDir(Utils::getConfigPath()).filePath("config.conf"),
-                                      QSettings::IniFormat))
-        , q_ptr(q)
-    {
-    }
-
-    //~DFontMgrMainWindowPrivate() {}
-    QWidget *titleActionArea {nullptr};
-    DIconButton *addFontButton {nullptr};
-    DSearchEdit *searchFontEdit {nullptr};
-
-    QWidget *fontShowArea {nullptr};
-
-    //Shadow line of StateBar
-    DHorizontalLine  *sbarShadowLine {nullptr};
-
-    QWidget *stateBar {nullptr};
-    DLineEdit *textInputEdit {nullptr};
-    DSlider *fontScaleSlider {nullptr};
-    DLabel *fontSizeLabel {nullptr};
-
-    DSplitter *mainWndSpliter {nullptr};
-    QWidget *leftBarHolder {nullptr};
-    QWidget *rightViewHolder {nullptr};
-
-    // Menu
-    DMenu *toolBarMenu {nullptr};
-    DMenu *rightKeyMenu {nullptr};
-
-    DSplitListWidget *leftSiderBar {nullptr};
-
-    QScopedPointer<QSettings> settingsQsPtr;
-    DFontMgrMainWindow *q_ptr;
-
-    Q_DECLARE_PUBLIC(DFontMgrMainWindow)
-};
 
 /*************************************************************************
  <Function>      DFontMgrMainWindow
@@ -2045,6 +1982,7 @@ void DFontMgrMainWindow::showInstalledFiles()
 
     d->leftSiderBar->setCurrentIndex(d->leftSiderBar->model()->index(DSplitListWidget::UserFont, 0));
     onLeftSiderBarItemClicked(DSplitListWidget::UserFont);
+    qDebug() << "ASD" << endl;
 }
 
 /*************************************************************************
