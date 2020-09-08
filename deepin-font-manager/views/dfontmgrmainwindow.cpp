@@ -409,12 +409,12 @@ void DFontMgrMainWindow::initShortcuts()
 
     //Show next page --> PageDown
     if (nullptr == m_scPageDown) {
-        m_scDefaultSize = new QShortcut(this);
-        m_scDefaultSize->setKey(tr("PgDown"));
-        m_scDefaultSize->setContext(Qt::ApplicationShortcut);
-        m_scDefaultSize->setAutoRepeat(false);
+        m_scPageDown = new QShortcut(this);
+        m_scPageDown->setKey(tr("PgDown"));
+        m_scPageDown->setContext(Qt::ApplicationShortcut);
+        m_scPageDown->setAutoRepeat(false);
 
-        connect(m_scDefaultSize, &QShortcut::activated, this, [this] {
+        connect(m_scPageDown, &QShortcut::activated, this, [this] {
             //For: PageDown
             //Scrolling last visible item to top
             QRect visibleRect = m_fontPreviewListView->geometry();
@@ -1293,21 +1293,21 @@ void DFontMgrMainWindow::InitQuickWindowIfNeeded()
         m_quickInstallWnd.reset(new DFQuickInstallWindow());
 
         // Quick install mode handle
-        QObject::connect(this, &DFontMgrMainWindow::quickModeInstall, this,
-        [this](const QStringList & files) {
-            connect(m_quickInstallWnd.get(), &DFQuickInstallWindow::quickInstall, this,
-            [this, files]() {
-                this->installFont(files);
-            });
-            m_quickInstallWnd.get()->setWindowModality(Qt::WindowModal);
-            m_quickInstallWnd->onFileSelected(files);
-            m_quickInstallWnd->show();
-            //Reative the window
-            m_quickInstallWnd->raise();
-            m_quickInstallWnd->activateWindow();
+//        QObject::connect(this, &DFontMgrMainWindow::quickModeInstall, this,
+//        [this](const QStringList & files) {
+//            connect(m_quickInstallWnd.get(), &DFQuickInstallWindow::quickInstall, this,
+//            [this, files]() {
+//                this->installFont(files);
+//            });
+//            m_quickInstallWnd.get()->setWindowModality(Qt::WindowModal);
+//            m_quickInstallWnd->onFileSelected(files);
+//            m_quickInstallWnd->show();
+//            //Reative the window
+//            m_quickInstallWnd->raise();
+//            m_quickInstallWnd->activateWindow();
 
-            Dtk::Widget::moveToCenter(m_quickInstallWnd.get());
-        });
+//            Dtk::Widget::moveToCenter(m_quickInstallWnd.get());
+//        });
     }
 }
 
@@ -1513,6 +1513,7 @@ void DFontMgrMainWindow::onFontInstallFinished(const QStringList &fileList)
 *************************************************************************/
 void DFontMgrMainWindow::onUninstallFcCacheFinish()
 {
+//    qDebug() << m_fIsDeleting << endl;
     m_fIsDeleting &= ~Delete_Cacheing;
     qDebug() << __FUNCTION__ << m_fIsDeleting;
 }
@@ -1630,6 +1631,7 @@ void DFontMgrMainWindow::onLoadStatus(int type)
                 onLeftSiderBarItemClicked(m_leftIndex);
             }
             //弹出之前判断是否已有无结果view 539 31107
+            qDebug() << m_noInstallListView << endl;
             if (!m_noInstallListView->isVisible())
                 m_fontPreviewListView->show();
             //不是删除过程造成的安装等待，安装时也需要对相关标志为进行设置
