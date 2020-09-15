@@ -1730,6 +1730,7 @@ void DFontMgrMainWindow::delCurrentFont(bool activatedByRightmenu)
 
     DFDeleteDialog *confirmDelDlg = new DFDeleteDialog(this, m_menuDelCnt, m_menuSysCnt, m_menuCurCnt > 0, this);
 
+
     connect(confirmDelDlg, &DFDeleteDialog::accepted, this, [ = ]() {
         //记录移除前位置
         m_fontPreviewListView->markPositionBeforeRemoved(true, QModelIndexList());

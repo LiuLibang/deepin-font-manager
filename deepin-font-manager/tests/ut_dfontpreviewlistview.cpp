@@ -23,6 +23,8 @@
 #include <QTest>
 
 #include <gtest/gtest.h>
+//#include "gtest/gtest.h"
+#include "gmock/gmock.h"
 #include <gmock/gmock-matchers.h>
 #include "../third-party/stub/stub.h"
 
@@ -57,6 +59,53 @@ QWidget *stub_viewport()
     QWidget *widget = new QWidget;
     widget->setFixedHeight(120);
     return widget;
+}
+
+bool stub_False()
+{
+    return false;
+}
+
+bool stub_True()
+{
+    return true;
+}
+
+void  stub_Return()
+{
+    return ;
+}
+
+QPoint stub_pos()
+{
+    return QPoint(626, 22) ;
+}
+
+QList<DFontPreviewItemData> stub_getFontModelList()
+{
+    QList<DFontPreviewItemData> list;
+
+    DFontPreviewItemData data;
+    data.fontInfo.filePath = "first";
+
+    list << data;
+    return list;
+}
+
+DFontPreviewItemData stub_getFontData()
+{
+    DFontPreviewItemData data;
+    data.fontInfo.filePath = "first";
+
+    return data;
+}
+
+DFontPreviewItemData stub_getFontDataPath()
+{
+    DFontPreviewItemData data;
+    data.fontInfo.filePath = "/usr/share/fonts/truetype/msttcorefonts/Times_New_Roman_Bold.ttf";
+
+    return data;
 }
 
 }
@@ -274,28 +323,616 @@ TEST_F(TestDFontPreviewListView, checkSortModelIndexList)
 }
 
 //deleteFontModelIndex
-TEST_F(TestDFontPreviewListView, checkDeleteFontModelIndex)
+//TEST_F(TestDFontPreviewListView, checkDeleteFontModelIndex)
+//{
+////    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
+////    m_fontPreviewItemModel->setColumnCount(1);
+////    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
+////    fpm->setSourceModel(m_fontPreviewItemModel);
+////    DFontPreviewListView *listview = new DFontPreviewListView;
+////    listview->setModel(fpm);
+//    listview->m_fontPreviewItemModel->insertRows(1, 5);
+//    listview->m_fontPreviewProxyModel->insertRow(1);
+//    qDebug() << listview->m_fontPreviewItemModel->rowCount();
+
+////    listview->deleteFontModelIndex("", true);
+//}
+
+
+//UpdateSelection
+TEST_F(TestDFontPreviewListView, checkUpdateSelection)
 {
-//    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
-//    m_fontPreviewItemModel->setColumnCount(1);
-//    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
-//    fpm->setSourceModel(m_fontPreviewItemModel);
+    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
+    m_fontPreviewItemModel->setColumnCount(1);
+    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
+    fpm->setSourceModel(m_fontPreviewItemModel);
+
+    listview->setModel(fpm);
+//    m_fontPreviewItemModel->insertRows(0, 5);
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->m_selectAfterDel = 1;
+
+    listview->updateSelection();
+
+    listview->m_selectAfterDel = 5;
+    listview->updateSelection();
+
+    Stub s;
+    s.set(ADDR(DFontPreviewListView, isAtListviewTop), stub_False);
+
+    Stub s2;
+    s2.set(ADDR(DFontPreviewListView, isAtListviewBottom), stub_True);
+    listview->updateSelection();
+
+
+}
+
+TEST_F(TestDFontPreviewListView, refreshRect)
+{
+    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
+    m_fontPreviewItemModel->setColumnCount(1);
+    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
+    fpm->setSourceModel(m_fontPreviewItemModel);
+    DFontPreviewListView *listview = new DFontPreviewListView;
+    listview->setModel(fpm);
+    m_fontPreviewItemModel->insertRows(0, 5);
+
+    listview->refreshRect();
+
+    listview->selectAll();
+
+    listview->refreshRect();
+}
+
+TEST_F(TestDFontPreviewListView, checkScrollWithTheSelected)
+{
+    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
+    m_fontPreviewItemModel->setColumnCount(1);
+    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
+    fpm->setSourceModel(m_fontPreviewItemModel);
+    DFontPreviewListView *listview = new DFontPreviewListView;
+    listview->setModel(fpm);
+    m_fontPreviewItemModel->insertRows(0, 5);
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->scrollWithTheSelected();
+    EXPECT_TRUE(listview->m_currentSelectedRow == 0);
+
+    listview->selectAll();
+    listview->scrollWithTheSelected();
+}
+
+TEST_F(TestDFontPreviewListView, checkChangeFontFileForce)
+{
+    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
+    m_fontPreviewItemModel->setColumnCount(1);
+    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
+    fpm->setSourceModel(m_fontPreviewItemModel);
+    DFontPreviewListView *listview = new DFontPreviewListView;
+    listview->setModel(fpm);
+    m_fontPreviewItemModel->insertRows(0, 5);
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->changeFontFile("", true);
+}
+
+TEST_F(TestDFontPreviewListView, checkChangeFontFileUnForce)
+{
+    Stub s;
+    s.set(ADDR(QFileInfo, isDir), stub_True);
+
+    Stub s1;
+    s1.set(ADDR(DFontPreviewListDataThread, getFontModelList), stub_getFontModelList);
+
+
+    listview->changeFontFile("first", false);
+
+}
+
+TEST_F(TestDFontPreviewListView, checkDeleteCurFonts)
+{
+    QSignalSpy spy(listview, SIGNAL(requestUpdateModel(bool)));
+
+    listview->deleteCurFonts(QStringList(), false);
+    EXPECT_TRUE(spy.count() == 1);
+
+    Stub s1;
+    s1.set(ADDR(DFontPreviewListDataThread, getFontModelList), stub_getFontModelList);
+
+    QStringList list;
+    list << "first";
+
+    listview->deleteCurFonts(list, true);
+    EXPECT_TRUE(spy.count() == 2);
+
+}
+
+TEST_F(TestDFontPreviewListView, checkUpdateChangedDir)
+{
+    QSignalSpy spy(listview, SIGNAL(itemRemoved(const DFontPreviewItemData &)));
+    QSignalSpy spy2(listview, SIGNAL(rowCountChanged()));
+
+    Stub s1;
+    s1.set(ADDR(DFontPreviewListDataThread, getFontModelList), stub_getFontModelList);
+
+
+    listview->updateChangedDir("first");
+
+    EXPECT_TRUE(spy.count() == 1);
+    EXPECT_TRUE(spy2.count() == 1);
+}
+
+TEST_F(TestDFontPreviewListView, checkUpdateChangedFile)
+{
+    Stub s1;
+    s1.set(ADDR(DFontPreviewListView, changeFontFile), stub_Return);
+
+
+    QSignalSpy spy(listview, SIGNAL(rowCountChanged()));
+
+    listview->updateChangedFile("first");
+
+    EXPECT_TRUE(spy.count() == 1);
+
+}
+
+TEST_F(TestDFontPreviewListView, checkClearHoverState)
+{
+    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
+    m_fontPreviewItemModel->setColumnCount(1);
+
+    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
+    fpm->setSourceModel(m_fontPreviewItemModel);
+
+    DFontPreviewListView *listview = new DFontPreviewListView;
+    listview->setModel(fpm);
+
+    m_fontPreviewItemModel->insertRows(0, 5);
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->m_hoverModelIndex = listview->m_fontPreviewProxyModel->index(2, 0);
+
+    FontData data;
+    data.setHoverState(IconHover);
+
+    listview->m_fontPreviewProxyModel->setData(listview->m_fontPreviewProxyModel->index(2, 0), QVariant::fromValue(data), Qt::DisplayRole);
+
+    listview->clearHoverState();
+    EXPECT_TRUE(listview->m_hoverModelIndex == QModelIndex());
+
+    FontData itemData =
+        qvariant_cast<FontData>(listview->m_fontPreviewProxyModel->data(listview->m_fontPreviewProxyModel->index(2, 0)));
+
+    EXPECT_TRUE(itemData.getHoverState() == IconNormal);
+}
+
+TEST_F(TestDFontPreviewListView, checkClearPressStateMoveClear)
+{
+    QStandardItemModel *m_fontPreviewItemModel = new QStandardItemModel;
+    m_fontPreviewItemModel->setColumnCount(1);
+
+    DFontPreviewProxyModel *fpm = new DFontPreviewProxyModel;
+    fpm->setSourceModel(m_fontPreviewItemModel);
+
+    DFontPreviewListView *listview = new DFontPreviewListView;
+    listview->setModel(fpm);
+
+    m_fontPreviewItemModel->insertRows(0, 5);
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->m_previousPressPos = 1;
+
+    FontData data;
+    data.setHoverState(IconHover);
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+    listview->m_fontPreviewProxyModel->setData(index, QVariant::fromValue(data));
+
+    QModelIndex index2 = listview->m_fontPreviewProxyModel->index(2, 0);
+    listview->m_pressModelIndex = index2;
+    listview->m_fontPreviewProxyModel->setData(index2, QVariant::fromValue(data));
+
+    listview->clearPressState(DFontPreviewListView::MoveClear, 0);
+    EXPECT_TRUE(listview->m_pressModelIndex == QModelIndex());
+    FontData itemData =
+        qvariant_cast<FontData>(listview->m_fontPreviewProxyModel->data(listview->m_pressModelIndex));
+    EXPECT_TRUE(itemData.getHoverState() == IconNormal);
+}
+
+TEST_F(TestDFontPreviewListView, checkClearPressStatePreviousClear)
+{
+
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->m_previousPressPos = 1;
+
+    FontData data;
+    data.setHoverState(IconHover);
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+    listview->m_fontPreviewProxyModel->setData(index, QVariant::fromValue(data));
+
+    listview->clearPressState(DFontPreviewListView::PreviousClear, 0);
+
+    FontData itemData =
+        qvariant_cast<FontData>(listview->m_fontPreviewProxyModel->data(index));
+    EXPECT_TRUE(itemData.getHoverState() == IconNormal);
+
+}
+
+TEST_F(TestDFontPreviewListView, checkCurrModelData)
+{
+    Stub s;
+    s.set(ADDR(DFontPreviewListDataThread, getFontData), stub_getFontData);
+
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+    listview->m_previousPressPos = 1;
+
+    FontData data;
+    data.strFontName = "first";
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+    listview->m_fontPreviewProxyModel->setData(index, QVariant::fromValue(data));
+    listview->selectionModel()->select(index, QItemSelectionModel::Select);
+
+    DFontPreviewItemData data2 = listview->currModelData();
+    EXPECT_TRUE(data2.fontInfo.filePath == "first");
+}
+
+TEST_F(TestDFontPreviewListView, checkCurrModelIndex)
+{
+    Stub s;
+    s.set(ADDR(DFontPreviewListDataThread, getFontData), stub_getFontData);
+
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(0, 0);
+    listview->selectionModel()->select(index, QItemSelectionModel::Select);
+    index = listview->m_fontPreviewProxyModel->index(1, 0);
+    listview->selectionModel()->select(index, QItemSelectionModel::Select);
+
+    QModelIndex currentIndex = listview->currModelIndex();
+
+    EXPECT_TRUE(currentIndex.row() == 0);
+
+}
+
+TEST_F(TestDFontPreviewListView, checkOnCollectBtnClicked)
+{
+    QSignalSpy spy(listview, SIGNAL(rowCountChanged()));
+
+    listview->onCollectBtnClicked(QModelIndexList(), true, true);
+    EXPECT_TRUE(spy.count() == 0);
+
+    Stub s;
+    s.set(ADDR(DFontPreviewListDataThread, updateItemStatus), stub_Return);
 //    DFontPreviewListView *listview = new DFontPreviewListView;
-//    listview->setModel(fpm);
-    listview->m_fontPreviewItemModel->insertRows(1, 5);
-    listview->m_fontPreviewProxyModel->insertRow(1);
-    qDebug() << listview->m_fontPreviewItemModel->rowCount();
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
 
-//    listview->deleteFontModelIndex("", true);
+    listview->selectAll();
+    QModelIndexList list = listview->selectedIndexes();
+
+    listview->onCollectBtnClicked(list, true, true);
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+
+    FontData itemData =
+        qvariant_cast<FontData>(listview->m_fontPreviewProxyModel->data(index));
+
+    EXPECT_TRUE(itemData.fontState == 0x02);
+
+    EXPECT_TRUE(spy.count() == 1);
 }
 
-
-//isDeleting
-TEST_F(TestDFontPreviewListView, checkIsDeleting)
+TEST_F(TestDFontPreviewListView, checkOnEnableBtnClickedEnable)
 {
-//    QMouseEvent *event = new QMouseEvent();
-//    QTest::mouseClick(listview, Qt::LeftButton);
+    QSignalSpy spy(listview, SIGNAL(rowCountChanged()));
+
+    Stub s;
+    s.set(ADDR(DFontPreviewListDataThread, getFontData), stub_getFontDataPath);
+
+    listview->onEnableBtnClicked(QModelIndexList(), 0, 0, false, true);
+    EXPECT_TRUE(spy.count() == 0);
+
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    Stub s1;
+    s1.set(ADDR(DFontPreviewListDataThread, updateItemStatus), stub_Return);
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+
+    listview->selectionModel()->select(index, QItemSelectionModel::Select);
+
+    QModelIndexList list;
+    list << index;
+
+    listview->onEnableBtnClicked(list, 0, 1, true, true);
+
+    FontData itemData =
+        qvariant_cast<FontData>(listview->m_fontPreviewProxyModel->data(index));
+    EXPECT_TRUE(itemData.fontState == 0x01);
+
+    listview->onEnableBtnClicked(list, 1, 1, false, true);
+    listview->onEnableBtnClicked(list, 0, 0, false, true);
+
 }
+
+TEST_F(TestDFontPreviewListView, checkHoverState)
+{
+    Stub s1;
+    s1.set(ADDR(QWidget, isVisible), stub_True);
+
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->selectAll();
+    listview->onRightMenuShortCutActivated();
+}
+
+TEST_F(TestDFontPreviewListView, checkIsAtListviewTopTrue)
+{
+    listview->verticalScrollBar()->setMinimum(100);
+    listview->verticalScrollBar()->setValue(100);
+    EXPECT_TRUE(listview->isAtListviewTop());
+}
+
+TEST_F(TestDFontPreviewListView, checkIsAtListviewTopFalse)
+{
+    listview->verticalScrollBar()->setMinimum(100);
+    listview->verticalScrollBar()->setMaximum(800);
+    listview->verticalScrollBar()->setValue(800);
+    qDebug() << listview->verticalScrollBar()->minimum() << "++++++++" << listview->verticalScrollBar()->value() << endl;
+
+    EXPECT_FALSE(listview->isAtListviewTop());
+}
+
+TEST_F(TestDFontPreviewListView, checkIsAtListviewBottomTrue)
+{
+    listview->verticalScrollBar()->setMinimum(100);
+    listview->verticalScrollBar()->setMaximum(800);
+    listview->verticalScrollBar()->setValue(800);
+    EXPECT_TRUE(listview->isAtListviewBottom());
+}
+
+TEST_F(TestDFontPreviewListView, checkIsAtListviewBottomFalse)
+{
+    listview->verticalScrollBar()->setMinimum(100);
+    listview->verticalScrollBar()->setMaximum(800);
+    listview->verticalScrollBar()->setValue(100);
+    EXPECT_TRUE(listview->isAtListviewTop());
+}
+
+TEST_F(TestDFontPreviewListView, checkUpdateShiftSelect)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->m_currentSelectedRow = 1;
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+    listview->updateShiftSelect(index);
+
+    EXPECT_TRUE(listview->selectedIndexes().count() == 1);
+
+    index = listview->m_fontPreviewProxyModel->index(2, 0);
+    listview->updateShiftSelect(index);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 2);
+
+    listview->m_currentSelectedRow = -1;
+    index = listview->m_fontPreviewProxyModel->index(3, 0);
+    listview->updateShiftSelect(index);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 4);
+}
+
+TEST_F(TestDFontPreviewListView, checkDisableFonts)
+{
+    listview->disableFont("first");
+    listview->disableFonts();
+    EXPECT_TRUE(listview->m_disableFontList.count() == 0);
+
+    Stub s1;
+    s1.set(ADDR(DFMXmlWrapper, createFontConfigFile), stub_False);
+
+    listview->disableFont("first");
+    listview->disableFonts();
+    EXPECT_TRUE(listview->m_disableFontList.count() == 1);
+}
+
+TEST_F(TestDFontPreviewListView, checkEnableFonts)
+{
+    listview->enableFont("first");
+    listview->enableFonts();
+    EXPECT_TRUE(listview->m_enableFontList.count() == 0);
+
+    Stub s1;
+    s1.set(ADDR(DFMXmlWrapper, createFontConfigFile), stub_False);
+
+    listview->enableFont("first");
+    listview->enableFonts();
+    EXPECT_TRUE(listview->m_enableFontList.count() == 1);
+}
+
+TEST_F(TestDFontPreviewListView, checkEventFilterFocusOut)
+{
+    QSignalSpy spy(listview->m_signalManager, SIGNAL(setLostFocusState(bool)));
+
+    QEvent *e = new QEvent(QEvent::FocusOut);
+
+    listview->m_isLostFocusOfLeftKey = true;
+    listview->eventFilter(listview, e);
+    EXPECT_FALSE(listview->m_isLostFocusOfLeftKey);
+
+    listview->eventFilter(listview, e);
+    EXPECT_TRUE(spy.count() == 1);
+}
+
+TEST_F(TestDFontPreviewListView, checkEventFilterFocusIn)
+{
+    QSignalSpy spy(listview->m_signalManager, SIGNAL(requestSetTabFocusToAddBtn()));
+
+    QFocusEvent *e = new QFocusEvent(QEvent::FocusIn, Qt::TabFocusReason);
+
+    listview->m_isGetFocusFromSlider = true;
+
+    listview->eventFilter(listview, e);
+    EXPECT_TRUE(spy.count() == 1);
+}
+
+TEST_F(TestDFontPreviewListView, checkKeyPressEventFilterEmpty)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    listview->keyPressEventFilter(QModelIndexList(), true, false, false);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 1);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 4);
+
+    listview->keyPressEventFilter(QModelIndexList(), false, true, false);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 1);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 0);
+}
+
+TEST_F(TestDFontPreviewListView, checkKeyPressEventFilterUp)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+    QModelIndexList indexList;
+    indexList.append(index);
+
+    listview->m_currentSelectedRow = 0;
+    listview->keyPressEventFilter(indexList, true, false, true);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 1);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 0);
+
+    listview->m_currentSelectedRow = 1;
+    listview->keyPressEventFilter(indexList, true, false, true);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 1);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 0);
+
+    indexList.clear();
+    index = listview->m_fontPreviewProxyModel->index(0, 0);
+    indexList.append(index);
+    listview->keyPressEventFilter(indexList, true, false, false);
+
+    Stub s1;
+    s1.set(ADDR(DFontPreviewListView, isAtListviewTop), stub_True);
+    listview->keyPressEventFilter(indexList, true, false, false);
+    EXPECT_TRUE(listview->m_currentSelectedRow = 4);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 4);
+
+    listview->m_currentSelectedRow = 4;
+    indexList.clear();
+    index = listview->m_fontPreviewProxyModel->index(3, 0);
+    indexList.append(index);
+    listview->keyPressEventFilter(indexList, true, false, false);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 3);
+    EXPECT_TRUE(listview->m_currentSelectedRow == 3);
+}
+
+TEST_F(TestDFontPreviewListView, checkKeyPressEventFilterDown)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+    QModelIndexList indexList;
+    indexList.append(index);
+
+    listview->m_currentSelectedRow = 2;
+    listview->keyPressEventFilter(indexList, false, true, true);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 1);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 2);
+
+    index = listview->m_fontPreviewProxyModel->index(3, 0);
+    indexList.clear();
+    indexList.append(index);
+    listview->keyPressEventFilter(indexList, false, true, true);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 2);
+    EXPECT_TRUE(listview->selectedIndexes().at(1).row() == 4);
+
+    listview->keyPressEventFilter(indexList, false, true, false);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 1);
+    EXPECT_TRUE(listview->selectedIndexes().first().row() == 3);
+
+}
+
+TEST_F(TestDFontPreviewListView, checkkeyPressEventKey_End)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    QTest::keyPress(listview->viewport(), Qt::Key_End, Qt::NoModifier);
+    EXPECT_TRUE(listview->currentIndex().row() == 4);
+
+    listview->m_currentSelectedRow = 0;
+    QTest::keyPress(listview->viewport(), Qt::Key_End, Qt::ShiftModifier);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 5);
+
+    listview->m_currentSelectedRow = -1;
+    QTest::keyPress(listview->viewport(), Qt::Key_End, Qt::ShiftModifier);
+    EXPECT_TRUE(listview->m_currentSelectedRow == 0);
+
+}
+
+TEST_F(TestDFontPreviewListView, checkkeyPressEventKey_Home)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+
+    QTest::keyPress(listview->viewport(), Qt::Key_Home, Qt::NoModifier);
+    EXPECT_TRUE(listview->currentIndex().row() == 0);
+
+    listview->m_currentSelectedRow = 4;
+    QTest::keyPress(listview->viewport(), Qt::Key_Home, Qt::ShiftModifier);
+    EXPECT_TRUE(listview->selectedIndexes().count() == 5);
+}
+
+TEST_F(TestDFontPreviewListView, checkkeyPressEventKey_UpDown)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+    listview->selectAll();
+
+    QSignalSpy spy(listview->m_signalManager, SIGNAL(requestSetLeftSiderBarFocus()));
+
+
+    QTest::keyPress(listview->viewport(), Qt::Key_Up, Qt::ShiftModifier);
+
+    QTest::keyPress(listview->viewport(), Qt::Key_Down, Qt::ShiftModifier);
+
+    QTest::keyPress(listview->viewport(), Qt::Key_Down, Qt::ControlModifier);
+
+    QTest::keyPress(listview->viewport(), Qt::Key_Up, Qt::NoModifier);
+
+    QTest::keyPress(listview->viewport(), Qt::Key_Down, Qt::NoModifier);
+
+    QTest::keyPress(listview->viewport(), Qt::Key_Left, Qt::NoModifier);
+
+    EXPECT_TRUE(spy.count() == 1);
+}
+
+TEST_F(TestDFontPreviewListView, checkrowsAboutToBeRemoved)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+    listview->selectAll();
+
+    QModelIndex index = listview->m_fontPreviewProxyModel->index(1, 0);
+
+    listview->rowsAboutToBeRemoved(index, 1, 1);
+
+    EXPECT_TRUE(listview->selectionModel()->currentIndex().row() == 1);
+}
+
+TEST_F(TestDFontPreviewListView, checkIfHasSelection)
+{
+    listview->m_fontPreviewProxyModel->insertRows(0, 5);
+    listview->checkIfHasSelection();
+    EXPECT_TRUE(listview->m_currentSelectedRow == -1);
+}
+
+//TEST_F(TestDFontPreviewListView, checkOnMouseLeftBtnReleased)
+//{
+////    Stub s1;
+////    s1.set((bool(QRect::*)(const QPoint &, bool)) ADDR(QRect, contains), stub_show);
+
+////    Stub stub;
+////        stub.set((bool(QRect::*)(const QPoint &,bool))ADDR(QRect,contains), foo_stub_int);
+//}
 
 
 

@@ -20,4 +20,7 @@ SOURCES += \
     $$PWD/ut_dsplitlistwidget.cpp \
     $$PWD/ut_fonticontext.cpp \
     $$PWD/ut_dfinstallnormalwindow.cpp \
-    $$PWD/ut_dfontmgrmainwindow.cpp
+    $$PWD/ut_dfontmgrmainwindow.cpp \
+    $$PWD/ut_dfmxmlwrapper.cpp
+
+HEADERS +=

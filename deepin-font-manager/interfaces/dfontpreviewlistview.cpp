@@ -1502,7 +1502,7 @@ void DFontPreviewListView::keyPressEvent(QKeyEvent *event)
                     keyPressEventFilter(list, false, true, true);
                     return;
                 }
-            } else if (QApplication::keyboardModifiers() == Qt::CTRL && list.count() > 0) {
+            } else if (QApplication::keyboardModifiers() == Qt::ControlModifier && list.count() > 0) {
                 return;
             }
             //判断当前选中item是否为首个或末尾，首个按上键且在可见时切换至末尾选中，末尾按下键且可见时切换至首个选中 UT000539
@@ -1796,6 +1796,7 @@ bool DFontPreviewListView::isAtListviewBottom()
 *************************************************************************/
 bool DFontPreviewListView::isAtListviewTop()
 {
+    qDebug() << this->verticalScrollBar()->minimum() << "++++++++" << this->verticalScrollBar()->value() << endl;
     if (this->verticalScrollBar()->value() <= this->verticalScrollBar()->minimum()) {
         return true;
     }
@@ -2538,6 +2539,7 @@ void DFontPreviewListView::scrollWithTheSelected()
     if (0 == selectedIndexes().count()) {
         QModelIndex modelIndex = getFontPreviewProxyModel()->index(0, 0);
         if (modelIndex.isValid()) {
+            qDebug() << modelIndex.row();
             setCurrentIndex(modelIndex);
             setCurrentSelected(0);
         }
@@ -2594,7 +2596,10 @@ void DFontPreviewListView::updateSelection()
     if (m_selectAfterDel != -1) {
         m_bListviewAtButtom = isAtListviewBottom();
         m_bListviewAtTop = isAtListviewTop();
+
         DFontPreviewProxyModel *filterModel = this->getFontPreviewProxyModel();
+
+        qDebug() << filterModel->rowCount() << endl;
         if (m_bListviewAtButtom && !m_bListviewAtTop) {
             QModelIndex modelIndex = filterModel->index(m_selectAfterDel - 1, 0);
             setCurrentIndex(modelIndex);
